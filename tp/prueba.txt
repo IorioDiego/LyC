@@ -1,49 +1,51 @@
 DECVAR
-var2;var3 : float
-var2;var4;var5 : integer
+DIM var2;var3  Float
+DIM var2;var4;var5  Integer
 ENDDEC
 
--/      RANGOS       /-
 
--/ variableConNombreFueraDelRangoEstablecido : 4 -/compruebaRangoID/- /-
 
--/ var2 : 45432; -/compruebaRangoCTE_ENT/- /-
 
--/ var2 : 45432222222222222222222222222; -/compruebaRangoCTE_ENT/- /-
 
--/ var3 : 341282346600000000000000000000000000000.0; -/compruebaRangoCTE_REAL/-  /-
+/* COMPARACIONES Y ASIGNACIONES   */
 
--/ var4 : 0.00000000000000000000000000000000000003302823466; -/compruebaRangoCTE_REAL/- /-
-
--/ var5 : "Esto  es   una prueba   para1   "; -/compruebaRangoString/- /-
-
--/     CICLOS ANIDADOS, TEMAS ESPECIALES Y COMUNES , SELECCIONES, ASIGNACIONES   /-
-
-var2 : (3.5 MOD 4.2);
-var3 : 2.1 - (4 DIV 3);
-var2 : 25555555555555555555555.5;
-var1 : "Hola";
-
-read var; 
 if(var1 == var2)
 {
     if(var1 == var2 OR var2 >= var4)
     {
-        while(var3!=var4 AND var4==var5)
+        while(var3!=var4 AND var4 <= var5)
         {
-            var1 : var2 + 3;
-        }
-    }
-    else
-    {
-        if(inlist(a;[.99;99.;2*b+7]) AND var1>var2)
+            var1 := var2 + 3;
+        }else
         {
-            while(NOT var3!=var4)
-            {
-                var1 : var2 + 3;
-            }
+            var45 := var32 / var1;
+            var67 := var22 * var11;
         }
-        write "hola que tal";
-        write var1;
-    }
+        
+
 }
+
+/*VARIABLES*/
+var1
+
+
+/* REALES */
+.1
+2.3434343
+9.0
+
+/* ENTERO*/
+13000
+2500
+2500000000
+
+
+/* STRING */
+
+"Hhola mundo"
+"1233"
+"_^{{{}*"
+
+
+/*RANGO*/
+"holaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaAAAAAAAAAAAAAAAAAA"

@@ -1,13 +1,18 @@
 %{ 
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <string.h>
+#define STR_LIMIT 30
 
 FILE  *yyin;
 int yylval;
 int yylex();
 int yyparse();
-int yyerror();
+char* yyerror();
+
+
+char* validarRango( char *text );
+
 %}
 
 
@@ -23,12 +28,9 @@ int yyerror();
 DIGITO		            ([0-9])
 LETRA			        [a-zA-Z]
 
+ID		            	(({LETRA}|{DIGITO})+)
 
-CONST_REAL              {DIGITO}+"."{DIGITO}+|"."{DIGITO}|{DIGITO}+"."
-CONST_STR               \".*\" 
-CONST_ENT	            {DIGITO}+
-COMENTARIO              \/\*.\*\/
-ID		            	({LETRA}|{DIGITO})+                    
+               
 
 COMA                    [,]
 PUNTOYCOMA              [;]
@@ -70,12 +72,49 @@ OR                      "OR"
 NOT                     "NOT"
 AS                      "AS"
   
+CONST_REAL              {DIGITO}+"."{DIGITO}+|"."{DIGITO}|{DIGITO}+"."
+CONST_STR               \".*\" 
+CONST_ENT	            {DIGITO}+
+COMENTARIO              \/\*.*\*\/
+
+
 %%
 
+{DECVAR}         printf("\nDECVAR: %s\n",yytext);
+{DIM}           printf("\nDIM: %s\n",yytext);
+{GET}            printf("\nGET: %s\n",yytext);
+{ENDDEC}         printf("\nENDDEC: %s\n",yytext);
+{DISPLAY}          printf("\nDISPLAY: %s\n",yytext);
+{WHILE}          printf("\nWHILE: %s\n",yytext);
+{IF}            printf("\nIF: %s\n",yytext);
+{INTEGER}        printf("\nINTEGER: %s\n",yytext);
+{FLOAT}         printf("\nFLOAT: %s\n",yytext);
+{ELSE}           printf("\nELSE: %s\n",yytext);
+{AS}            printf("\nAS: %s\n",yytext);
+
+{AND}              printf("\nAND: %s\n",yytext);
+{OR}                printf("\nOR: %s\n",yytext);
+{NOT}              printf("\nNOT: %s\n",yytext);
 
 
+{ID}                 printf("\nID Variable: %s\n",yytext);
 {COMA}             printf("\nComa: %s\n",yytext);
 {PUNTOYCOMA}     printf("\nPunto y Coma: %s\n",yytext);
+{COMENTARIO}    printf("\nComentario: %s\n",yytext);  
+
+
+{CONST_ENT}     printf("\nConstante Entero: %s\n",yytext);
+{CONST_STR}     printf("\nConstante String: %s\n",validarRango(yytext));
+{CONST_REAL}    printf("\nConstante Real: %s\n",yytext);  
+
+{PAR_A}	        printf("\nParentesis Abre: %s\n",yytext);
+{PAR_C}	         printf("\nParentesis Cerrado: %s\n",yytext);
+{LLAV_A}         printf("\nLLave Abre: %s\n",yytext);
+{LLAV_C}	        printf("\nLLave Cierra: %s\n",yytext);
+{COR_A}           printf("\nCorchete Abre: %s\n",yytext);
+{COR_C}            printf("\nCorechete Cierra: %s\n",yytext);
+
+{OP_ASIG}	    printf("\nOperador Asignacion: %s\n",yytext);
 {OP_MAY}		   printf("\nOperador Mayor: %s\n",yytext);
 {OP_MAYIGU}        printf("\nOperador Mayor o igual: %s\n",yytext);
 {OP_MEN}            printf("\nOperador Menor: %s\n",yytext);
@@ -86,31 +125,7 @@ AS                      "AS"
 {OP_SUMA}           printf("\nOperador Suma: %s\n",yytext);
 {OP_MULT}            printf("\nOperador Multiplicacion: %s\n",yytext); 
 {OP_ASIG}            printf("\nOperador Asignacion: %s\n",yytext); 
-{AND}              printf("\nAND: %s\n",yytext);
-{OR}                printf("\nOR: %s\n",yytext);
-{NOT}              printf("\nNOT: %s\n",yytext);
 
-{DECVAR}         printf("\nDECVAR: %s\n",yytext);
-{DIM}           printf("\nDIM: %s\n",yytext);
-{GET}            printf("\nGET: %s\n",yytext);
-{ENDDEC}         printf("\nnCENDDEC: %s\n",yytext);
-{DISPLAY}          printf("\nDISPLAY: %s\n",yytext);
-{WHILE}          printf("\nWHILE: %s\n",yytext);
-{IF}            printf("\nIF: %s\n",yytext);
-{INTEGER}        printf("\nINTEGER: %s\n",yytext);
-{FLOAT}         printf("\nFLOAT: %s\n",yytext);
-{ELSE}           printf("\nELSE: %s\n",yytext);
-{OP_ASIG}	    printf("\nOperador Asignacion: %s\n",yytext);
-{PAR_A}	        printf("\nParentesis Abre: %s\n",yytext);
-{PAR_C}	         printf("\nParentesis Cerrado: %s\n",yytext);
-{LLAV_A}         printf("\nLLave Abre: %s\n",yytext);
-{LLAV_C}	        printf("\nLLave Cierra: %s\n",yytext);
-{COR_A}           printf("\nCorchete Abre: %s\n",yytext);
-{COR_C}            printf("\nCorechete Cierra: %s\n",yytext);
-
-{CONST_ENT}     printf("\nConstante Entero: %s\n",yytext);
-{CONST_STR}     printf("\nConstante String: %s\n",yytext);
-{CONST_REAL}    printf("\nConstante Real: %s\n",yytext);  
 "\n"
 "\t"
 "\n\t"
@@ -137,8 +152,19 @@ else
 
 
 
-int yyerror(void){
-    printf("Error Lexico : Caracter invalido: %s\n",yytext);
-    exit(1);
+char* yyerror(void){
+    return "Error Lexico";
+    
 
+}
+
+char* validarRango( char *text ){
+    if(strlen(text)>30)
+        {
+            return yyerror();
+        }
+        else{
+          return text;
+        }
+   
 }
