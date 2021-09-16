@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "y.tab.h"
 #define STR_LIMITE 100
 #define ID_LIMITE 30
 #define ENT_LIMITE 5
@@ -82,6 +83,7 @@ WHILE	            	"WHILE"
 DECVAR		            "DECVAR"
 ENDECVAR	            "ENDECVAR"
 INTEGER	            	"INTEGER"
+STRING                  "STRING"
 FLOAT		            "FLOAT"
 ELSE		            "ELSE"
 AND                     "AND"
@@ -192,7 +194,7 @@ if ((yyin = fopen(argv[1], "rt")) == NULL)
     }
 else
     {
-        yylex();
+        yyparse();
     }
     escribirTablaSimbolos();
     fclose(fpTabla);
