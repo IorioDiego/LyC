@@ -58,18 +58,17 @@ int abrirTablaDeSimbolos();
 DIGITO		            ([0-9])
 LETRA			        [a-zA-Z]
 
+LONG                    "LONG"
 ID		            	{LETRA}({LETRA}|{DIGITO})*
 
-               
 
 COMA                    [,]
-PUNTOYCOMA              [;]
+
 
 
 PAR_A	                [(]
 PAR_C	                [)]
-LLAV_A	                [{]
-LLAV_C              	[}]
+
 COR_A                   [[]
 COR_C                   []]
 
@@ -79,23 +78,27 @@ DISPLAY                 "DISPLAY"
 GET                     "GET"
 IF			            "IF"
 ENDIF                   "ENDIF"
-WHILE	            	"while"
+WHILE	            	"WHILE"
 DECVAR		            "DECVAR"
-ENDDEC	            	"ENDDEC"
-INTEGER	            	"Integer"
-FLOAT		            "Float"
-ELSE		            "else"
+ENDECVAR	            "ENDECVAR"
+INTEGER	            	"INTEGER"
+FLOAT		            "FLOAT"
+ELSE		            "ELSE"
 AND                     "AND"
 OR                      "OR"
 NOT                     "NOT"
 AS                      "AS"
 DO                      "DO"
 ENDWHILE                "ENDWHILE"
-  
+IN                      "IN"
+THEN                    "THEN"
+
+
+
 CONST_REAL              {DIGITO}+"."{DIGITO}+|"."{DIGITO}|{DIGITO}+"."
 CONST_STR               \".*\" 
 CONST_ENT	            "-"?{DIGITO}+
-COMENTARIO              \/\*.*\*\/
+COMENTARIO              \/\*(" "|"-"|\/|\.|\"|{DIGITO}|{LETRA})**\*\/
 
 OP_MAY		            [>]
 OP_MAYIGU	            ">="
@@ -111,10 +114,11 @@ OP_RESTA                [-]
 
 %%
 
+{LONG}           printf("\nLONG: %s\n",yytext);
 {DECVAR}         printf("\nDECVAR: %s\n",yytext);
 {DIM}           printf("\nDIM: %s\n",yytext);
 {GET}            printf("\nGET: %s\n",yytext);
-{ENDDEC}         printf("\nENDDEC: %s\n",yytext);
+{ENDECVAR}         printf("\nENDECVAR: %s\n",yytext);
 {DISPLAY}          printf("\nDISPLAY: %s\n",yytext);
 {WHILE}          printf("\nWHILE: %s\n",yytext);
 {IF}            printf("\nIF: %s\n",yytext);
@@ -124,10 +128,15 @@ OP_RESTA                [-]
 {AS}            printf("\nAS: %s\n",yytext);
 {DO}             printf("\nDO: %s\n",yytext);
 {ENDWHILE}       printf("\nENDWHILE: %s\n",yytext);
+{IN}             printf("\nIN: %s\n",yytext);
+{STRING}         printf("\nSTRING: %s\n",yytext);   
+{THEN}           printf("\nTHEN: %s\n",yytext);   
+
 
 {AND}              printf("\nAND: %s\n",yytext);
 {OR}                printf("\nOR: %s\n",yytext);
 {NOT}              printf("\nNOT: %s\n",yytext);
+
 
 
 {CONST_ENT}     printf("\nConstante Entero: %s\n",validarRangoEntero(yytext));
@@ -136,16 +145,15 @@ OP_RESTA                [-]
 
 {ID}                 printf("\nID Variable: %s\n",validarRangoID(yytext));
 {COMA}             printf("\nComa: %s\n",yytext);
-{PUNTOYCOMA}     printf("\nPunto y Coma: %s\n",yytext);
-{COMENTARIO}    printf("\nComentario: %s\n",yytext);  
+
+{COMENTARIO}   
 
 
  
 
 {PAR_A}	        printf("\nParentesis Abre: %s\n",yytext);
 {PAR_C}	         printf("\nParentesis Cerrado: %s\n",yytext);
-{LLAV_A}         printf("\nLLave Abre: %s\n",yytext);
-{LLAV_C}	        printf("\nLLave Cierra: %s\n",yytext);
+
 {COR_A}           printf("\nCorchete Abre: %s\n",yytext);
 {COR_C}            printf("\nCorechete Cierra: %s\n",yytext);
 
@@ -161,6 +169,7 @@ OP_RESTA                [-]
 {OP_MULT}            printf("\nOperador Multiplicacion: %s\n",yytext); 
 {OP_ASIG}            printf("\nOperador Asignacion: %s\n",yytext); 
 {OP_RESTA}           printf("\nOperador Resta: %s\n",yytext);   
+
 
 "\n"
 "\t"
@@ -199,24 +208,25 @@ char* yyerror(void){
 
 char* validarRangoString( char *text ){
     if(strlen(text)>STR_LIMITE)
-        {
+{
             printf("Eror String: %s - ",text);
             return yyerror();
         }
-        else{
+else{
             cargarVecTablaString(text);
           return text;
-        }
+}
 }
 
 
 char* validarRangoID( char *text ){
     if(strlen(text)>ID_LIMITE)
-        {
+{
             printf("Eror ID: %s - ",text);
             return yyerror();
-        }
-        else{
+}
+else{
+        cargarVecTablaID(text);
           return text;
         } 
 }
@@ -242,6 +252,7 @@ printf("Valor del entero : %s\n",text+1 );
         }
    
     }
+ cargarVecTablaNumero(text);
  return text;
 }
 
@@ -272,22 +283,52 @@ int abrirTablaDeSimbolos()
 void escribirTablaSimbolos()
 { 
     int i;
+    fprintf(fpTabla,"NOMBRE\t\t\tTIPO\t\t\tVALOR\t\t\tLONGITUD\n");
     for(i = 0 ; i < cantReg; i++)
     {
-        fwrite(&tb[i],sizeof(tablaSimbolos),1,fpTabla); 
-
+        fprintf(fpTabla,"%-s\t\t\t%-s\t\t\t%-s\t\t\t%-d\n",tb[i].nombre ,tb[i].tipo ,tb[i].valor,tb[i].longitud);
     }
-   
 }
 
 void cargarVecTablaNumero(char * text)
 {
-    
+    int tamanio=strlen(text),i;
+    char aux[tamanio+2];
+    aux[0]='_';
+    for (i=1; i<= tamanio ; i++ )
+    {
+        aux[i]=*(text+i-1);
+
+    }
+    aux[i]='\0';
+    strcpy(tb[cantReg].nombre,aux);
+    strcpy(tb[cantReg].valor,text);
+    tb[cantReg].tipo[0] ='-';
+    tb[cantReg].tipo[1] ='\0'; 
+    tb[cantReg].longitud = 0;
+    printf("\nNombre : %s   -   Valor : %s -   longitud :    %d\n",tb[cantReg].nombre , tb[cantReg].valor,tb[cantReg].longitud);
+
+    cantReg++;
 }
 
 void cargarVecTablaID(char * text)
 {
-    
+    int tamanio=strlen(text),i;
+    char aux[tamanio+2];
+    aux[0]='_';
+    for (i=1; i<= tamanio ; i++ )
+    {
+        aux[i]=*(text+i-1);
+    }
+    aux[tamanio+1]='\0';
+    strcpy(tb[cantReg].nombre,aux);
+    strcpy(tb[cantReg].valor,"-\0");
+    tb[cantReg].tipo[0] ='-';
+    tb[cantReg].tipo[1] ='\0'; 
+    tb[cantReg].longitud = 0;
+    printf("\nNombre : %s   -   Valor : %s -   longitud :    %d\n",tb[cantReg].nombre,tb[cantReg].valor,tb[cantReg].longitud);
+
+    cantReg++;
 }
 
 
@@ -308,10 +349,11 @@ void cargarVecTablaString(char * text)
     
     strcpy(tb[cantReg].nombre,aux);
     strcpy(tb[cantReg].valor,text);
+    tb[cantReg].tipo[0] ='-';
+    tb[cantReg].tipo[1] ='\0';
     tb[cantReg].longitud = strlen(text)-2;
 
-    printf("\nNombre : %s   -   Valor : %s -   longitud :    %d\n",tb[cantReg].nombre , tb[cantReg].valor,tb[cantReg].longitud  );
+    printf("\nNombre : %s   -   Valor : %s -   longitud :    %d\n",tb[cantReg].nombre , tb[cantReg].valor,tb[cantReg].longitud);
 
     cantReg++;
-    
 }
