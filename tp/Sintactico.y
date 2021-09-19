@@ -14,9 +14,10 @@ int yyerror();
 %right OP_ASIG 
 %left OP_SUMA OP_RESTA
 %left OP_MULT OP_DIV
+%right MENOS_UNARIO
 
 %token OP_MAY OP_MAYIGU OP_MEN OP_MENIGU OP_IGUAL OP_DIF
-%token WHILE IF INTEGER FLOAT STRING ELSE THEN DECVAR ENDECVAR AS IN AND OR NOT LONG
+%token WHILE IF INTEGER FLOAT STRING ELSE THEN DECVAR ENDDECVAR AS IN AND OR NOT LONG
 %token  DISPLAY DIM COMA ENDIF ENDWHILE DO GET PAR_A PAR_C COR_A COR_C
 
 %token ID CONST_ENT CONST_REAL CONST_STR
@@ -24,95 +25,95 @@ int yyerror();
 
 %%
 
-
 programa:
-    sentencia
-    | programa sentencia                
+    sentencia                       {printf("\nREGLA 1: <programa> --> <sentencia>\n");}       
+    | programa sentencia            {printf("\nREGLA 2: <programa> --> <programa> <sentencia>\n");};              
     
 sentencia:
-     declaracion
-    |asignacion
-    |ciclo
-    |seleccion
-    |salida
-    |entrada
-    |longitud;
+     declaracion                     {printf("\nREGLA 3: <sentencia> --> <declaracion>\n");}  
+    |asignacion                      {printf("\nREGLA 4: <sentencia> --> <asignacion>\n");}   
+    |ciclo                           {printf("\nREGLA 5: <sentencia> --> <cilco>\n");}   
+    |seleccion                       {printf("\nREGLA 6: <sentencia> --> <seleccion>\n");}   
+    |salida                          {printf("\nREGLA 7: <sentencia> --> <salida>\n");}   
+    |entrada                         {printf("\nREGLA 8: <sentencia> --> <entrada>\n");} 
+    |longitud                        {printf("\nREGLA 9: <sentencia> --> <longitud>\n");}; 
 
 
 declaracion:
-    DECVAR DIM COR_A listavar COR_C AS COR_A listatipodato COR_C ENDECVAR;
+    DECVAR DIM COR_A listavar COR_C AS COR_A listatipodato COR_C ENDDECVAR    {printf("\nREGLA 10: <declaracion> --> DECVAR DIM COR_A <listavar> COR_C AS COR_A <listatipodato> COR_C ENDDECVAR\n");};    
 
 listavar:
-    ID
-    | listavar COMA ID;
+    ID                              {printf("\nREGLA 11: <listavar> --> ID \n");}
+    | listavar COMA ID             {printf("\nREGLA 12: <listavar> --> <listavar> COMA ID\n");};
 
 listatipodato:
-    tipodato
-    | listatipodato COMA tipodato;
+    tipodato                        {printf("\nREGLA 13: <listatipodato> --> <tipodato> \n");}
+    | listatipodato COMA tipodato  {printf("\nREGLA 14: <listatipodato> --> <listatipodato> COMA <tipodato>\n");};
 
 tipodato:
-    INTEGER
-    | FLOAT
-    | STRING;
+    INTEGER                         {printf("\nREGLA 15: <tipodato> --> INTEGER  \n");}
+    | FLOAT                         {printf("\nREGLA 16: <tipodato> --> FLOAT \n");}
+    | STRING                        {printf("\nREGLA 17: <tipodato> --> STRING \n");};
 
 seleccion:
-    IF condicion THEN programa ELSE programa ENDIF
-    | IF condicion THEN programa ENDIF;
+    IF condicion THEN programa ELSE programa ENDIF      {printf("\nREGLA 18: <seleccion> --> IF <condicion> THEN <programa> ELSE <programa> ENDIF\n");}
+    | IF condicion THEN programa ENDIF                  {printf("\nREGLA 19: <seleccion> --> IF <condicion> THEN <programa> ENDIF \n");};
 
 ciclo:
-    WHILE ID IN COR_A lista COR_C DO sentencia ENDWHILE;
+    WHILE ID IN COR_A lista COR_C DO programa ENDWHILE         {printf("\nREGLA 20: <ciclo> --> WHILE ID IN COR_A <lista> COR_C DO <sentencia> ENDWHILE\n");};
 
 entrada:
-    GET factor;
+    GET ID                                          {printf("\nREGLA 21: <entrada> --> GET <factor>\n");};
 
 salida:
-    DISPLAY CONST_STR;
+    DISPLAY CONST_STR                                   {printf("\nREGLA 22: <salida> -->  DISPLAY CONST_STR  \n");};
 
 asignacion:
-    ID OP_ASIG expresion;
+    ID OP_ASIG expresion                                {printf("\nREGLA 23: <asignacion> --> <ID><OP_ASIG><expresion> \n");};
 
 condicion:
     comparacion
-    | condicion AND comparacion
-    | condicion OR comparacion
-    | PAR_A NOT condicion PAR_C AND comparacion
-    | PAR_A  NOT condicion PAR_C OR comparacion;
+    | condicion AND comparacion                         {printf("\nREGLA 24: <condicion> --> <comparacion> \n");}
+    | condicion OR comparacion                          {printf("\nREGLA 25: <condicion> --> <comparacion><AND><comparacion>\n");}
+    | PAR_A NOT condicion PAR_C AND comparacion         {printf("\nREGLA 26: <condicion> --> <PAR_A><NOT><condicion><PAR_C><comparacion> \n");}
+    | PAR_A  NOT condicion PAR_C OR comparacion         {printf("\nREGLA 27: <condicion> --> <PAR_A><NOT><condicion><PAR_C><comparacion> \n");};
 
 comparacion:
-    expresion comparador expresion;
+    expresion comparador expresion                     {printf("\nREGLA 28: <comparacion> --> <expresion><comparador><expresion> \n");};
 
 expresion:
-    expresion OP_SUMA termino
-    | expresion OP_RESTA termino
-    | termino;
+    expresion OP_SUMA termino                           {printf("\nREGLA 29: <expresion> --> <expresion><OP_SUMA><termino> \n");}
+    | expresion OP_RESTA termino                        {printf("\nREGLA 30: <expresion> --> <expresion><OP_RESTA><termino> \n");}
+    | termino                                           {printf("\nREGLA 31: <expresion> --> <termino> \n");}
+    |OP_RESTA expresion %prec MENOS_UNARIO               {printf("\nREGLA 32: <expresion> --> OP_RESTA <expresion> \n");}                               ;
 
 termino:
-    termino OP_MULT factor
-    | termino OP_DIV factor
-    | factor;
+    termino OP_MULT factor                              {printf("\nREGLA 33: <termino> --> <termino><OP_MULT><factor> \n");}
+    | termino OP_DIV factor                             {printf("\nREGLA 34: <termino> --> <termino><OP_DIV><factor> \n");}
+    | factor                                            {printf("\nREGLA 35: <termino> --> <factor> \n");};
 
 longitud:
-    LONG PAR_A lista PAR_C;
+    LONG PAR_A lista PAR_C                              {printf("\nREGLA 36: <longitud> --> <LONG><PAR_A><lista><PAR_C>\n");};
 
 lista:
-    factor
-    | lista COMA factor;
+    factor                                              {printf("\nREGLA 37: <lista> --> <factor> \n");}
+    | lista COMA factor                                 {printf("\nREGLA 38: <lista> --> <lista><COMA><factor> \n");};
 
 factor:
-    PAR_A expresion PAR_C
-    | CONST_REAL
-    | ID
-    | CONST_ENT;
+    PAR_A expresion PAR_C       {printf("\nREGLA 39: <factor> --> <PAR_A><expresion><PAR_C>\n");} 
+    | CONST_REAL                {printf("\nREGLA 40: <factor> --> <CONST_REAL>\n");} 
+    | ID                        {printf("\nREGLA 41: <factor> --> <ID>\n");} 
+    | CONST_ENT                 {printf("\nREGLA 42: <factor> --> <CONST_ENT>\n");};
 
 comparador:
-    OP_MAY 
-    | OP_MEN
-    | OP_MENIGU
-    | OP_MAYIGU
-    | OP_IGUAL
-    | OP_DIF;
-
+    OP_MAY          {printf("\nREGLA 43: <comparador> --> <OP_MAY>\n");} 
+    | OP_MEN        {printf("\nREGLA 44: <comparador> --> <OP_MEN>\n");} 
+    | OP_MENIGU     {printf("\nREGLA 45: <programa> --> <OP_MENIGU>\n");} 
+    | OP_MAYIGU     {printf("\nREGLA 46: <programa> --> <OP_MAYIGU>\n");} 
+    | OP_IGUAL      {printf("\nREGLA 47: <programa> --> <OP_IGUAL>\n");} 
+    | OP_DIF        {printf("\nREGLA 48: <programa> --> <OP_DIF>\n");};
 
 
 %%
+
 

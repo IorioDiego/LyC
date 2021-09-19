@@ -3,10 +3,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include "y.tab.h"
+
 #define STR_LIMITE 100
 #define ID_LIMITE 30
 #define ENT_LIMITE 5
-
+#define TABLA_SIMBOLOS_TXT "ts.txt"
 
 #define COTA_INFERIOR_ENT -32768
 #define COTA_SUPERIOR_ENT 32767
@@ -32,7 +33,7 @@ FILE * fpTabla;
 int yylval;
 int yylex();
 int yyparse();
-char* yyerror();
+char * yyerror();
 
 
 char* validarRangoString( char *text );
@@ -58,9 +59,9 @@ int abrirTablaDeSimbolos();
 
 DIGITO		            ([0-9])
 LETRA			        [a-zA-Z]
-
+CARACTERES              @|\?|\"|\.|\,|\+|\t|\n|\/|\_|\:|\;|¿|\*|{LETRA}|{DIGITO}|" "|=|\*|>|<|-  
 LONG                    "LONG"
-ID		            	{LETRA}({LETRA}|{DIGITO})*
+
 
 
 COMA                    [,]
@@ -81,7 +82,7 @@ IF			            "IF"
 ENDIF                   "ENDIF"
 WHILE	            	"WHILE"
 DECVAR		            "DECVAR"
-ENDECVAR	            "ENDECVAR"
+ENDDECVAR	            "ENDDECVAR"
 INTEGER	            	"INTEGER"
 STRING                  "STRING"
 FLOAT		            "FLOAT"
@@ -100,7 +101,9 @@ THEN                    "THEN"
 CONST_REAL              {DIGITO}+"."{DIGITO}+|"."{DIGITO}|{DIGITO}+"."
 CONST_STR               \".*\" 
 CONST_ENT	            "-"?{DIGITO}+
-COMENTARIO              \/\*(" "|"-"|\/|\.|\"|{DIGITO}|{LETRA})**\*\/
+
+COMENTARIO              \/\*({CARACTERES})*\*\/
+ID		            	{LETRA}({LETRA}|{DIGITO})*
 
 OP_MAY		            [>]
 OP_MAYIGU	            ">="
@@ -116,69 +119,70 @@ OP_RESTA                [-]
 
 %%
 
-{LONG}           printf("\nLONG: %s\n",yytext);
-{DECVAR}         printf("\nDECVAR: %s\n",yytext);
-{DIM}           printf("\nDIM: %s\n",yytext);
-{GET}            printf("\nGET: %s\n",yytext);
-{ENDECVAR}         printf("\nENDECVAR: %s\n",yytext);
-{DISPLAY}          printf("\nDISPLAY: %s\n",yytext);
-{WHILE}          printf("\nWHILE: %s\n",yytext);
-{IF}            printf("\nIF: %s\n",yytext);
-{INTEGER}        printf("\nINTEGER: %s\n",yytext);
-{FLOAT}         printf("\nFLOAT: %s\n",yytext);
-{ELSE}           printf("\nELSE: %s\n",yytext);
-{AS}            printf("\nAS: %s\n",yytext);
-{DO}             printf("\nDO: %s\n",yytext);
-{ENDWHILE}       printf("\nENDWHILE: %s\n",yytext);
-{IN}             printf("\nIN: %s\n",yytext);
-{STRING}         printf("\nSTRING: %s\n",yytext);   
-{THEN}           printf("\nTHEN: %s\n",yytext);   
+{LONG}           {printf("\nLONG: %s\n",yytext); return LONG;}
+{DECVAR}         {printf("\nDECVAR: %s\n",yytext);return DECVAR;}
+{DIM}          {printf("\nDIM: %s\n",yytext);return DIM;}
+{GET}           {printf("\nGET: %s\n",yytext);return GET;}
+{ENDDECVAR}         {printf("\nENDDECVAR: %s\n",yytext);return ENDDECVAR;}
+{DISPLAY}          {printf("\nDISPLAY: %s\n",yytext);return DISPLAY;}
+{WHILE}          {printf("\nWHILE: %s\n",yytext);return WHILE;}
+{IF}            {printf("\nIF: %s\n",yytext);return IF;}
+{INTEGER}        {printf("\nINTEGER: %s\n",yytext);return INTEGER;}
+{FLOAT}         {printf("\nFLOAT: %s\n",yytext);return FLOAT;}
+{ELSE}           {printf("\nELSE: %s\n",yytext);return ELSE;}
+{AS}            {printf("\nAS: %s\n",yytext);return AS;}
+{DO}             {printf("\nDO: %s\n",yytext);return DO;}
+{ENDWHILE}       {printf("\nENDWHILE: %s\n",yytext);return ENDWHILE;}
+{IN}             {printf("\nIN: %s\n",yytext);return IN;}
+{STRING}         {printf("\nSTRING: %s\n",yytext);return STRING;}   
+{THEN}           {printf("\nTHEN: %s\n",yytext);return THEN;} 
+{ENDIF}         {printf("\nENDIF: %s\n",yytext);return ENDIF;} 
+
+{AND}              {printf("\nAND: %s\n",yytext);return AND;}
+{OR}                {printf("\nOR: %s\n",yytext);return OR;}
+{NOT}              {printf("\nNOT: %s\n",yytext);return NOT;}
 
 
-{AND}              printf("\nAND: %s\n",yytext);
-{OR}                printf("\nOR: %s\n",yytext);
-{NOT}              printf("\nNOT: %s\n",yytext);
 
+{CONST_ENT}     {printf("\nConstante Entero: %s\n",validarRangoEntero(yytext));return CONST_ENT;}
+{CONST_STR}     {printf("\nConstante String: %s\n",validarRangoString(yytext));return CONST_STR;}
+{CONST_REAL}    {printf("\nConstante Real: %s\n",validarRangoReal(yytext));return CONST_REAL;} 
 
-
-{CONST_ENT}     printf("\nConstante Entero: %s\n",validarRangoEntero(yytext));
-{CONST_STR}     printf("\nConstante String: %s\n",validarRangoString(yytext));
-{CONST_REAL}    printf("\nConstante Real: %s\n",validarRangoReal(yytext)); 
-
-{ID}                 printf("\nID Variable: %s\n",validarRangoID(yytext));
-{COMA}             printf("\nComa: %s\n",yytext);
+{ID}                 {printf("\nID Variable: %s\n",validarRangoID(yytext));return ID;}
+{COMA}             {printf("\nComa: %s\n",yytext);return COMA;}
 
 {COMENTARIO}   
 
 
  
 
-{PAR_A}	        printf("\nParentesis Abre: %s\n",yytext);
-{PAR_C}	         printf("\nParentesis Cerrado: %s\n",yytext);
+{PAR_A}	        {printf("\nParentesis Abre: %s\n",yytext);return PAR_A;}
+{PAR_C}	         {printf("\nParentesis Cerrado: %s\n",yytext);return PAR_C;}
 
-{COR_A}           printf("\nCorchete Abre: %s\n",yytext);
-{COR_C}            printf("\nCorechete Cierra: %s\n",yytext);
+{COR_A}           {printf("\nCorchete Abre: %s\n",yytext);return COR_A;}
+{COR_C}            {printf("\nCorechete Cierra: %s\n",yytext);return COR_C;}
 
-{OP_ASIG}	    printf("\nOperador Asignacion: %s\n",yytext);
-{OP_MAY}		   printf("\nOperador Mayor: %s\n",yytext);
-{OP_MAYIGU}        printf("\nOperador Mayor o igual: %s\n",yytext);
-{OP_MEN}            printf("\nOperador Menor: %s\n",yytext);
-{OP_MENIGU}        printf("\nOperador Menor o Igual: %s\n",yytext);
-{OP_IGUAL}         printf("\nOperador Igual: %s\n",yytext);
-{OP_DIF}            printf("\nOperador Distinto : %s\n",yytext);
-{OP_DIV}            printf("\nOperador Divison: %s\n",yytext);
-{OP_SUMA}           printf("\nOperador Suma: %s\n",yytext);
-{OP_MULT}            printf("\nOperador Multiplicacion: %s\n",yytext); 
-{OP_ASIG}            printf("\nOperador Asignacion: %s\n",yytext); 
-{OP_RESTA}           printf("\nOperador Resta: %s\n",yytext);   
+{OP_ASIG}	   {printf("\nOperador Asignacion: %s\n",yytext);return OP_ASIG;}
+{OP_MAY}		   {printf("\nOperador Mayor: %s\n",yytext);return OP_MAY;}
+{OP_MAYIGU}        {printf("\nOperador Mayor o igual: %s\n",yytext);return OP_MAYIGU;}
+{OP_MEN}            {printf("\nOperador Menor: %s\n",yytext);return OP_MEN;}
+{OP_MENIGU}        {printf("\nOperador Menor o Igual: %s\n",yytext);return OP_MENIGU;}
+{OP_IGUAL}         {printf("\nOperador Igual: %s\n",yytext);return OP_IGUAL;}
+{OP_DIF}            {printf("\nOperador Distinto : %s\n",yytext);return OP_DIF;}
+{OP_DIV}            {printf("\nOperador Divison: %s\n",yytext);return OP_DIV;}
+{OP_SUMA}           {printf("\nOperador Suma: %s\n",yytext);return OP_SUMA;}
+{OP_MULT}            {printf("\nOperador Multiplicacion: %s\n",yytext);return OP_MULT;} 
+{OP_ASIG}            {printf("\nOperador Asignacion: %s\n",yytext);return OP_ASIG;} 
+{OP_RESTA}           {printf("\nOperador Resta: %s\n",yytext);return OP_RESTA;}
 
 
 "\n"  
-"\t" 
+"\t"
+"\r" 
 "\n\t" 
 "\r\n"               
 " "                 
-.                yyerror();
+.                yyerror(yytext);
 
 %%
 
@@ -204,9 +208,9 @@ else
 
 
 
-char* yyerror(void){
-    return (char*)printf("Error Lexico en linea %d\n",yylineno) ;
-}
+ char* yyerror(void){
+     return (char*)printf("Error Lexico en linea %d\n",yylineno) ;
+ }
 
 char* validarRangoString( char *text ){
     if(strlen(text)>STR_LIMITE)
@@ -224,13 +228,14 @@ else{
 char* validarRangoID( char *text ){
     if(strlen(text)>ID_LIMITE)
 {
-            printf("Eror ID: %s - ",text);
-            return yyerror();
+        printf("Eror ID: %s - ",text);
+        return yyerror();
 }
 else{
+
         cargarVecTablaID(text);
           return text;
-        } 
+    } 
 }
 
 
@@ -273,7 +278,7 @@ char* validarRangoReal( char *text ){
 
 int abrirTablaDeSimbolos()
 {
-    fpTabla = fopen("tablaDeSimbolos.txt","wt");
+    fpTabla = fopen(TABLA_SIMBOLOS_TXT,"wt");
     if(!fpTabla)
     {
         printf("Error de apertura del archivo de la tabla de simbolos");
@@ -294,68 +299,96 @@ void escribirTablaSimbolos()
 
 void cargarVecTablaNumero(char * text)
 {
-    int tamanio=strlen(text),i;
-    char aux[tamanio+2];
-    aux[0]='_';
-    for (i=1; i<= tamanio ; i++ )
+   int duplicados = 0,j;
+    for ( j=0 ;j< cantReg; j++)
     {
-        aux[i]=*(text+i-1);
-
+        if(strcmp(text,(tb[j].nombre)+1)==0)
+            duplicados = 1;      
     }
-    aux[i]='\0';
-    strcpy(tb[cantReg].nombre,aux);
-    strcpy(tb[cantReg].valor,text);
-    tb[cantReg].tipo[0] ='-';
-    tb[cantReg].tipo[1] ='\0'; 
-    tb[cantReg].longitud = 0;
-    printf("\nNombre : %s   -   Valor : %s -   longitud :    %d\n",tb[cantReg].nombre , tb[cantReg].valor,tb[cantReg].longitud);
 
-    cantReg++;
+    if(!duplicados){
+        int tamanio=strlen(text),i;
+        char aux[tamanio+2];
+        aux[0]='_';
+        for (i=1; i<= tamanio ; i++ )
+        {
+            aux[i]=*(text+i-1);
+
+        }
+        aux[i]='\0';
+        strcpy(tb[cantReg].nombre,aux);
+        strcpy(tb[cantReg].valor,text);
+        tb[cantReg].tipo[0] ='-';
+        tb[cantReg].tipo[1] ='\0'; 
+        tb[cantReg].longitud = 0;
+        //printf("\nNombre : %s   -   Valor : %s -   longitud :    %d\n",tb[cantReg].nombre , tb[cantReg].valor,tb[cantReg].longitud);
+
+        cantReg++;
+    }
+
+
+
 }
 
 void cargarVecTablaID(char * text)
 {
-    int tamanio=strlen(text),i;
-    char aux[tamanio+2];
-    aux[0]='_';
-    for (i=1; i<= tamanio ; i++ )
+    
+    int duplicados = 0,j;
+    for ( j=0 ;j< cantReg; j++)
     {
-        aux[i]=*(text+i-1);
+        if(strcmp(text,(tb[j].nombre)+1)==0)
+            duplicados = 1;      
     }
-    aux[tamanio+1]='\0';
-    strcpy(tb[cantReg].nombre,aux);
-    strcpy(tb[cantReg].valor,"-\0");
-    tb[cantReg].tipo[0] ='-';
-    tb[cantReg].tipo[1] ='\0'; 
-    tb[cantReg].longitud = 0;
-    printf("\nNombre : %s   -   Valor : %s -   longitud :    %d\n",tb[cantReg].nombre,tb[cantReg].valor,tb[cantReg].longitud);
-
-    cantReg++;
+    if(!duplicados)
+    {
+        int tamanio=strlen(text),i;
+        char aux[tamanio+2];
+        aux[0]='_';
+        for (i=1; i<= tamanio ; i++ )
+        {
+            aux[i]=*(text+i-1);
+        }
+        aux[tamanio+1]='\0';
+        strcpy(tb[cantReg].nombre,aux);
+        strcpy(tb[cantReg].valor,"-\0");
+        tb[cantReg].tipo[0] ='-';
+        tb[cantReg].tipo[1] ='\0'; 
+        tb[cantReg].longitud = 0;
+        //printf("\nNombre : %s   -   Valor : %s -   longitud :    %d\n",tb[cantReg].nombre,tb[cantReg].valor,tb[cantReg].longitud);
+        cantReg++;
+    }
+  
 }
 
 
 void cargarVecTablaString(char * text)
-{   
-    int i=0 ;
-    char aux [strlen(text)+1];
-    
-    strcpy(aux,text);
-    aux[0] = '_';
-    for (i=0; i<= strlen(text) ; i++ )
-    {
-        if(aux[i] == ' ')
-            aux[i]= '_';
-    }
-    printf("I : %c\n",aux[i-2]);
-    aux[i-2]='\0';
-    
-    strcpy(tb[cantReg].nombre,aux);
-    strcpy(tb[cantReg].valor,text);
-    tb[cantReg].tipo[0] ='-';
-    tb[cantReg].tipo[1] ='\0';
-    tb[cantReg].longitud = strlen(text)-2;
+{  
 
-    printf("\nNombre : %s   -   Valor : %s -   longitud :    %d\n",tb[cantReg].nombre , tb[cantReg].valor,tb[cantReg].longitud);
+        int duplicados = 0,j;
+        int i=0 ;
+        char aux [strlen(text)+1];
+        strcpy(aux,text);
+        aux[0] = '_';
+        for (i=0; i<= strlen(text) ; i++ )
+        {
+            if(aux[i] == ' ')
+                aux[i]= '_';
+        }
+        aux[i-2]='\0';
+        for ( j=0 ;j< cantReg; j++)
+        {
+            if(strcmp(aux,tb[j].nombre)==0)
+            duplicados = 1;      
+        }
+        if(!duplicados){
+            strcpy(tb[cantReg].nombre,aux);
+            strcpy(tb[cantReg].valor,text);
+            tb[cantReg].tipo[0] ='-';
+            tb[cantReg].tipo[1] ='\0';
+            tb[cantReg].longitud = strlen(text)-2;
+            cantReg++;
+        }
+   // printf("\nNombre : %s   -   Valor : %s -   longitud :    %d\n",tb[cantReg].nombre , tb[cantReg].valor,tb[cantReg].longitud);
 
-    cantReg++;
+    
 }

@@ -1,56 +1,93 @@
-DECVAR
-DIM var2 var3  FLOAT
-DIM var2 var4 var5  INTEGER
-ENDDEC
-
-
-
-
-
-/* COMPARACIONES Y ASIGNACIONES   */
-
-IF(var1 == var2)
-{
-    if(var1 == var2 OR var2 >= var4)
-    THEN
-        WHILE(var3!=var4 AND var4 <= var5)
-        DO
-            var1 := var2 + 3
-		
-      ELSE
-        
-	var1 := var3 - var5 
-        var45 := var32 / var1
-        var67 := var22 * var11
-        
-        
-
-}
-
-/*VARIABLES*/
-var1
-
-
-/* REALES */
-.1
-2.3434343
-9.0
-
-/* ENTERO*/
-13000
-2500
-250
-
 
 /* STRING */
+DISPLAY "HOLA MUNDO"
+DISPLAY "HOLA MUNDO"
+DECVAR
+DIM [var2,var3] AS [FLOAT,FLOAT]
+ENDDECVAR
 
-"Hhola mundo"
-"1233"
-"_^{{{}*"
+ 
+
+/* COMPARACIONES Y ASIGNACIONES  */
+
+IF var1 == var2 
+THEN 
+  
+	IF var1 == var2 OR var2 != var1
+        THEN   
+            WHILE var1 IN [ a , c , d]
+                DO
+                    var1 := var2 + 3
+                    var45 := var32 / var1
+                  var67 := var22 * var11 
+            ENDWHILE
+        ELSE
+            var45 := var32 / var1
+    ENDIF
+ENDIF
+ /* var45 := var32 / var1 */
+                  /*var67 := var22 * var11*/ 
+
+
+/* TEST IF */
+IF var1 >= var2 
+THEN 
+    var1 := var2 + 3
+ENDIF
+
+
+IF var1 <= var2 
+THEN 
+    var1 := var2 + 3
+ENDIF
+
+IF var1 > var2 
+THEN 
+    var1 := var2 + 3
+ENDIF
+
+
+IF var1 < var2 
+THEN 
+    var1 := var2 + 3
+ENDIF
+
+
+IF ( NOT var > var2 )OR var2 != var
+THEN 
+    var1 := var2 + 3
+ENDIF
+
+/* FIN TEST IF */
+
+/*TEST LONGITUD */ 
+
+LONG ( a,b,c) 
+
+
+var67 := var22 * var11 
+var1 := var3 - var5 
+var45 := var32 / var1
+
+var := -3
+
+/* REALES */
+var := .1
+var := 2.3434343
+var := 9.0
+
+/* ENTERO*/
+var := 13000
+var := 2500
+var := 250
+GET var
+
+
+
 
 
 /*RANGO*/
--32768
+var := -32768
 /*-32769*/
 /*214748364790*/
 /*33333333333333333333333333333333333333333333333333333333333333333333333333333333.5*/
