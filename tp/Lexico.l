@@ -173,12 +173,12 @@ OP_RESTA                [-]
 {OP_RESTA}           printf("\nOperador Resta: %s\n",yytext);   
 
 
-"\n"
-"\t"
-"\n\t"
-"\r\n"
-" "
-.               yyerror();
+"\n"  
+"\t" 
+"\n\t" 
+"\r\n"               
+" "                 
+.                yyerror();
 
 %%
 
@@ -205,7 +205,7 @@ else
 
 
 char* yyerror(void){
-    return (char*)printf("Error Lexico en linea %d",yylineno) ;
+    return (char*)printf("Error Lexico en linea %d\n",yylineno) ;
 }
 
 char* validarRangoString( char *text ){

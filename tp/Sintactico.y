@@ -20,14 +20,14 @@ int yyerror();
 %token  DISPLAY DIM COMA ENDIF ENDWHILE DO GET PAR_A PAR_C COR_A COR_C
 
 %token ID CONST_ENT CONST_REAL CONST_STR
-%token COMENTARIO
+
 
 %%
 
 
 programa:
     sentencia
-    | programa sentencia ;
+    | programa sentencia                
     
 sentencia:
      declaracion
@@ -35,7 +35,9 @@ sentencia:
     |ciclo
     |seleccion
     |salida
-    |entrada ;
+    |entrada
+    |longitud;
+
 
 declaracion:
     DECVAR DIM COR_A listavar COR_C AS COR_A listatipodato COR_C ENDECVAR;
@@ -73,8 +75,8 @@ condicion:
     comparacion
     | condicion AND comparacion
     | condicion OR comparacion
-    | NOT condicion AND comparacion
-    | NOT condicion OR comparacion;
+    | PAR_A NOT condicion PAR_C AND comparacion
+    | PAR_A  NOT condicion PAR_C OR comparacion;
 
 comparacion:
     expresion comparador expresion;
@@ -97,7 +99,7 @@ lista:
     | lista COMA factor;
 
 factor:
-    expresion
+    PAR_A expresion PAR_C
     | CONST_REAL
     | ID
     | CONST_ENT;
