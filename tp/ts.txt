@@ -1,5 +1,4 @@
 NOMBRE			TIPO			VALOR			LONGITUD
-_HOLA_MUNDO			-			"HOLA MUNDO"			10
 _var2			-			-			0
 _var3			-			-			0
 _var1			-			-			0
@@ -14,5 +13,3 @@ _var22			-			-			0
 _var11			-			-			0
 _var			-			-			0
 _b			-			-			0
-_var5			-			-			0
-_-3			-			-3			0
