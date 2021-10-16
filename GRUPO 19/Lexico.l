@@ -56,10 +56,11 @@ int abrirTablaDeSimbolos();
 
 
 
-
+ESPACIO                 [" "]
 DIGITO		            ([0-9])
 LETRA			        [a-zA-Z]
-CARACTERES              @|\?|\"|\.|\,|\+|\t|\n|\/|\_|\:|\;|¿|\*|{LETRA}|{DIGITO}|" "|=|\*|>|<|-  
+CARACTERES              @|\?|\"|\.|\,|\+|\t|\n|\/|\_|\:|\;|¿|\*|{LETRA}|{DIGITO}|{ESPACIO}|\=|\*|\>\<|\-  
+                      
 LONG                    "LONG"
 
 
@@ -102,7 +103,7 @@ CONST_REAL              {DIGITO}+"."{DIGITO}+|"."{DIGITO}|{DIGITO}+"."
 CONST_STR               \".*\" 
 CONST_ENT	            "-"?{DIGITO}+
 
-COMENTARIO              \/\*({CARACTERES})*\*\/
+COMENTARIO              \/\*.*\*\/
 ID		            	{LETRA}({LETRA}|{DIGITO})*
 
 OP_MAY		            [>]
@@ -213,11 +214,11 @@ else
  }
 
 char* validarRangoString( char *text ){
-    if(strlen(text)>STR_LIMITE)
-{
-            printf("Eror String: %s - ",text);
+    if( (strlen(text) - 2) >STR_LIMITE)
+    {
+            printf("Error String , cadena fuera del limite: %s - ",text);
             return yyerror();
-        }
+    }
 else{
             cargarVecTablaString(text);
           return text;
@@ -228,7 +229,7 @@ else{
 char* validarRangoID( char *text ){
     if(strlen(text)>ID_LIMITE)
 {
-        printf("Eror ID: %s - ",text);
+        printf("Error ID: %s - ",text);
         return yyerror();
 }
 else{
@@ -245,7 +246,7 @@ printf("Valor del entero : %s\n",text+1 );
     {
         if( strlen( text+1 ) > ENT_LIMITE || atoi(text) < COTA_INFERIOR_ENT )
         {
-           printf("Eror constante entera fuera del limite: %s - ",text);
+           printf("Error constante entera fuera del limite: %s - ",text);
             return yyerror();
         }
 
@@ -254,7 +255,7 @@ printf("Valor del entero : %s\n",text+1 );
     {
         if( strlen( text ) > ENT_LIMITE || atoi(text)> COTA_SUPERIOR_ENT )
         {
-             printf("Eror constante entera fuera del limite: %s - ",text);
+             printf("Error constante entera fuera del limite: %s - ",text);
             return yyerror();
         }
    
@@ -267,11 +268,12 @@ printf("Valor del entero : %s\n",text+1 );
 char* validarRangoReal( char *text ){
     if(atof(text) > COTA_SUPERIOR_REAL|| atof(text) <  COTA_INFERIOR_REAL) 
         {
-            printf("Eror Real: %s - ",text);
+            printf("Error Real fuera de limite : %s - ",text);
             return yyerror();
         }
         else{
-          return text;
+            cargarVecTablaNumero(text)
+;          return text;
         }
    
 }
@@ -375,7 +377,7 @@ void cargarVecTablaString(char * text)
                 aux[i]= '_';
         }
         aux[i-2]='\0';
-        for ( j=0 ;j< cantReg; j++)
+        for ( j=0 ;j < cantReg; j++)
         {
             if(strcmp(aux,tb[j].nombre)==0)
             duplicados = 1;      
@@ -387,8 +389,8 @@ void cargarVecTablaString(char * text)
             tb[cantReg].tipo[1] ='\0';
             tb[cantReg].longitud = strlen(text)-2;
             cantReg++;
+        //printf("\nNombre : %s   -   Valor : %s -   longitud :    %d\n",tb[cantReg-1].nombre , tb[cantReg-1].valor,tb[cantReg-1].longitud);
         }
-   // printf("\nNombre : %s   -   Valor : %s -   longitud :    %d\n",tb[cantReg].nombre , tb[cantReg].valor,tb[cantReg].longitud);
 
     
 }

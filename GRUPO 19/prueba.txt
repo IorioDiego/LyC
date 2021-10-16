@@ -1,11 +1,20 @@
-
-
 /* DECLARACION */ 
 DECVAR
 DIM [var2,var3] AS [FLOAT,FLOAT]
+DIM [var2,var3] AS [FLOAT,FLOAT]
+
+
 ENDDECVAR
 
- 
+DECVAR
+DIM [var1] AS [STRING]
+ENDDECVAR
+
+
+
+
+
+
 
 /* COMPARACIONES Y ASIGNACIONES  */
 
@@ -56,15 +65,13 @@ THEN
     var1 := var2 + 3
 ENDIF
 
-
 /*TEST LONGITUD */ 
-LONG ( a,b,c) 
+a :=LONG ( a,b,c) 
 
 /*ASIGNACIONES*/
 var67 := var22 * var11 
 var1 := var3 - var5 
 var45 := var32 / var1
-
 var := -3
 
 /* REALES */
@@ -80,16 +87,8 @@ var := 250
 /*GET*/
 GET var
 
-
-/* DISPLAY */
-DISPLAY "HOLA MUNDO"
-DISPLAY "HOLA MUNDO"
-
-
-/*RANGO*/
-var := -32768
-/*-32769*/
-/*214748364790*/
 /*33333333333333333333333333333333333333333333333333333333333333333333333333333333.5*/
-/*"holaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaAAAAAAAAAAAAAAAAAAholaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaAAAAAAAAAAAAAAAAAA"*/
+
+DISPLAY "HOLA MUNDO" 
+/*DISPLAY "holaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaAAAAAAAAAAAAAAAAAAholaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"*/
 
