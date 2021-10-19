@@ -22,7 +22,7 @@ typedef struct
 }tablaSimbolos;
 
 tablaSimbolos tb[2000];
-int cantReg;
+int* cantReg;
 FILE * fpTabla;
 char aux[1000] ;
 
