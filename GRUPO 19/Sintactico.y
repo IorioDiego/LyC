@@ -1,15 +1,28 @@
 %{
-#include "utilis/pila.h"
-#include <stdio.h>
-#include <stdlib.h>
-
-
+#include "utilis/funciones.h"
 #include "y.tab.h"
+
+
+
+
 int yystopparser=0;
 FILE  *yyin;
+int yyparse();
 int yylex();
 int yyparse();
 int yyerror();
+char * yytext;
+extern int cantReg;
+
+void escribirTablaSimbolos();
+void cargarVecTablaString(char * text);
+void cargarVecTablaID(char * text);
+void cargarVecTablaNumero(char * text);
+void cargarVecTablaString(char * text);
+int abrirTablaDeSimbolos();
+
+
+
 %}
 
 %start programa 
@@ -23,6 +36,10 @@ int yyerror();
 %token  DISPLAY DIM COMA ENDIF ENDWHILE DO GET PAR_A PAR_C COR_A COR_C
 
 %token ID CONST_ENT CONST_REAL CONST_STR
+
+%union {
+char *str_val;
+}
 
 
 %%
@@ -42,12 +59,12 @@ sentencia:
 
 
 declaracion:
-    DECVAR dec ENDDECVAR    {printf("\nREGLA 10: <declaracion> --> DECVAR DIM <dec> ENDDECVAR\n");};    
+    DECVAR {cantReg=0;} dec ENDDECVAR    {printf("\nREGLA 10: <declaracion> --> DECVAR DIM <dec> ENDDECVAR\n");};    
 
   
 listavar:
-    ID                              {printf("\nREGLA 11: <listavar> --> ID \n");}
-    | listavar COMA ID             {printf("\nREGLA 12: <listavar> --> <listavar> COMA ID\n");};
+    ID                              {cargarVecTablaID(yytext);printf("\nCANTIDDD DE REGISTROS >>>>>>>>>>>> %d\n", cantReg);printf("\nREGLA 11: <listavar> --> ID \n");}
+    | listavar COMA ID             {cargarVecTablaID(yytext);printf("\nREGLA 12: <listavar> --> <listavar> COMA ID\n");};
 
 listatipodato:
     tipodato                        {printf("\nREGLA 13: <listatipodato> --> <tipodato> \n");}
@@ -69,7 +86,7 @@ entrada:
     GET ID                                          {printf("\nREGLA 21: <entrada> --> GET <factor>\n");};
 
 salida:
-    DISPLAY CONST_STR                                   {printf("\nREGLA 22: <salida> -->  DISPLAY CONST_STR  \n");};
+    DISPLAY CONST_STR                                   {cargarVecTablaString(yylval.str_val);printf("\nREGLA 22: <salida> -->  DISPLAY CONST_STR  \n");};
 
 asignacion:
     ID OP_ASIG expresion                                {printf("\nREGLA 23: <asignacion> --> ID OP_ASIG <expresion> \n");};
@@ -123,4 +140,103 @@ dec:
 
 %%
 
+
+
+
+
+void cargarVecTablaNumero(char * text)
+{
+   int duplicados = 0,j;
+    for ( j=0 ;j< cantReg; j++)
+    {
+        if(strcmp(text,(tb[j].nombre)+1)==0)
+            duplicados = 1;      
+    }
+
+    if(!duplicados){
+        int tamanio=strlen(text),i;
+        char aux[tamanio+2];
+        aux[0]='_';
+        for (i=1; i<= tamanio ; i++ )
+        {
+            aux[i]=*(text+i-1);
+
+        }
+        aux[i]='\0';
+        strcpy(tb[cantReg].nombre,aux);
+        strcpy(tb[cantReg].valor,text);
+        tb[cantReg].tipo[0] ='-';
+        tb[cantReg].tipo[1] ='\0'; 
+        tb[cantReg].longitud = 0;
+        //printf("\nNombre : %s   -   Valor : %s -   longitud :    %d\n",tb[cantReg].nombre , tb[cantReg].valor,tb[cantReg].longitud);
+
+        cantReg++;
+    }
+
+
+
+}
+
+void cargarVecTablaID(char * text)
+{
+    
+    int duplicados = 0,j;
+    for ( j=0 ;j< cantReg; j++)
+    {
+        if(strcmp(text,(tb[j].nombre)+1)==0)
+            duplicados = 1;      
+    }
+    if(!duplicados)
+    {
+        int tamanio=strlen(text),i;
+        char aux[tamanio+2];
+        aux[0]='_';
+        for (i=1; i<= tamanio ; i++ )
+        {
+            aux[i]=*(text+i-1);
+        }
+        aux[tamanio+1]='\0';
+        strcpy(tb[cantReg].nombre,aux);
+        strcpy(tb[cantReg].valor,"-\0");
+        tb[cantReg].tipo[0] ='-';
+        tb[cantReg].tipo[1] ='\0'; 
+        tb[cantReg].longitud = 0;
+        //printf("\nNombre : %s   -   Valor : %s -   longitud :    %d\n",tb[cantReg].nombre,tb[cantReg].valor,tb[cantReg].longitud);
+        cantReg++;
+    }
+  
+}
+
+
+void cargarVecTablaString(char * text)
+{  
+
+        int duplicados = 0,j;
+        int i=0 ;
+        char aux [strlen(text)+1];
+        strcpy(aux,text);
+        aux[0] = '_';
+        for (i=0; i<= strlen(text) ; i++ )
+        {
+            if(aux[i] == ' ')
+                aux[i]= '_';
+        }
+        aux[i-2]='\0';
+        for ( j=0 ;j < cantReg; j++)
+        {
+            if(strcmp(aux,tb[j].nombre)==0)
+            duplicados = 1;      
+        }
+        if(!duplicados){
+            strcpy(tb[cantReg].nombre,aux);
+            strcpy(tb[cantReg].valor,text);
+            tb[cantReg].tipo[0] ='-';
+            tb[cantReg].tipo[1] ='\0';
+            tb[cantReg].longitud = strlen(text)-2;
+            cantReg++;
+        //printf("\nNombre : %s   -   Valor : %s -   longitud :    %d\n",tb[cantReg-1].nombre , tb[cantReg-1].valor,tb[cantReg-1].longitud);
+        }
+
+    
+}
 

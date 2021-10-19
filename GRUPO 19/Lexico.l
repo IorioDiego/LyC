@@ -1,8 +1,8 @@
 %{ 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+
+
 #include "y.tab.h"
+#include "utilis/funciones.h"
 
 #define STR_LIMITE 100
 #define ID_LIMITE 30
@@ -15,37 +15,36 @@
 #define COTA_SUPERIOR_REAL 3.4028235E+38
 #define COTA_INFERIOR_REAL -3.4028235E+38
 
+//typedef struct
+// {
+//     char nombre[200];
+//     char tipo[30];
+//     char valor[200];
+//     int longitud;   
 
+// }tablaSimbolos;
 
-typedef struct
-{
-    char nombre[200];
-    char tipo[30];
-    char valor[200];
-    int longitud;   
+// tablaSimbolos tb[2000];
 
-}tablaSimbolos;
-
-tablaSimbolos tb[2000];
-int cantReg=0;
 FILE  *yyin;
-FILE * fpTabla;
-int yylval;
+//FILE * fpTabla;
+char *yytext;
 int yylex();
 int yyparse();
 char * yyerror();
-
+extern int cantReg=0;
 
 char* validarRangoString( char *text );
 char* validarRangoEntero( char *text );
 char* validarRangoID( char *text );
 char* validarRangoReal( char *text );
-void escribirTablaSimbolos();
-void cargarVecTablaString(char * text);
-void cargarVecTablaID(char * text);
-void cargarVecTablaNumero(char * text);
-void cargarVecTablaString(char * text);
-int abrirTablaDeSimbolos();
+
+ void escribirTablaSimbolos();
+ // void cargarVecTablaString(char * text);
+ // void cargarVecTablaID(char * text);
+ // void cargarVecTablaNumero(char * text);
+ // void cargarVecTablaString(char * text);
+ int abrirTablaDeSimbolos();
 
 
 %}
@@ -190,6 +189,8 @@ OP_RESTA                [-]
 
 int main(int argc,char *argv[])
 {
+    printf("HOLAAAAAAAAAAAAA");
+
     
     abrirTablaDeSimbolos();
     
@@ -201,6 +202,7 @@ else
     {
         yyparse();
     }
+    printf("\nTABLA DE SIMBOLOS:\n");
     escribirTablaSimbolos();
     fclose(fpTabla);
     fclose(yyin);
@@ -220,7 +222,7 @@ char* validarRangoString( char *text ){
             return yyerror();
     }
 else{
-            cargarVecTablaString(text);
+            // cargarVecTablaString(text);
           return text;
 }
 }
@@ -234,7 +236,7 @@ char* validarRangoID( char *text ){
 }
 else{
 
-        cargarVecTablaID(text);
+        // cargarVecTablaID(text);
           return text;
     } 
 }
@@ -260,7 +262,7 @@ printf("Valor del entero : %s\n",text+1 );
         }
    
     }
- cargarVecTablaNumero(text);
+//  cargarVecTablaNumero(text);
  return text;
 }
 
@@ -272,8 +274,8 @@ char* validarRangoReal( char *text ){
             return yyerror();
         }
         else{
-            cargarVecTablaNumero(text)
-;          return text;
+        //  cargarVecTablaNumero(text);
+          return text;
         }
    
 }
@@ -299,98 +301,98 @@ void escribirTablaSimbolos()
     }
 }
 
-void cargarVecTablaNumero(char * text)
-{
-   int duplicados = 0,j;
-    for ( j=0 ;j< cantReg; j++)
-    {
-        if(strcmp(text,(tb[j].nombre)+1)==0)
-            duplicados = 1;      
-    }
+// void cargarVecTablaNumero(char * text)
+// {
+//    int duplicados = 0,j;
+//     for ( j=0 ;j< cantReg; j++)
+//     {
+//         if(strcmp(text,(tb[j].nombre)+1)==0)
+//             duplicados = 1;      
+//     }
 
-    if(!duplicados){
-        int tamanio=strlen(text),i;
-        char aux[tamanio+2];
-        aux[0]='_';
-        for (i=1; i<= tamanio ; i++ )
-        {
-            aux[i]=*(text+i-1);
+//     if(!duplicados){
+//         int tamanio=strlen(text),i;
+//         char aux[tamanio+2];
+//         aux[0]='_';
+//         for (i=1; i<= tamanio ; i++ )
+//         {
+//             aux[i]=*(text+i-1);
 
-        }
-        aux[i]='\0';
-        strcpy(tb[cantReg].nombre,aux);
-        strcpy(tb[cantReg].valor,text);
-        tb[cantReg].tipo[0] ='-';
-        tb[cantReg].tipo[1] ='\0'; 
-        tb[cantReg].longitud = 0;
-        //printf("\nNombre : %s   -   Valor : %s -   longitud :    %d\n",tb[cantReg].nombre , tb[cantReg].valor,tb[cantReg].longitud);
+//         }
+//         aux[i]='\0';
+//         strcpy(tb[cantReg].nombre,aux);
+//         strcpy(tb[cantReg].valor,text);
+//         tb[cantReg].tipo[0] ='-';
+//         tb[cantReg].tipo[1] ='\0'; 
+//         tb[cantReg].longitud = 0;
+//         //printf("\nNombre : %s   -   Valor : %s -   longitud :    %d\n",tb[cantReg].nombre , tb[cantReg].valor,tb[cantReg].longitud);
 
-        cantReg++;
-    }
+//         cantReg++;
+//     }
 
 
 
-}
+// }
 
-void cargarVecTablaID(char * text)
-{
+// void cargarVecTablaID(char * text)
+// {
     
-    int duplicados = 0,j;
-    for ( j=0 ;j< cantReg; j++)
-    {
-        if(strcmp(text,(tb[j].nombre)+1)==0)
-            duplicados = 1;      
-    }
-    if(!duplicados)
-    {
-        int tamanio=strlen(text),i;
-        char aux[tamanio+2];
-        aux[0]='_';
-        for (i=1; i<= tamanio ; i++ )
-        {
-            aux[i]=*(text+i-1);
-        }
-        aux[tamanio+1]='\0';
-        strcpy(tb[cantReg].nombre,aux);
-        strcpy(tb[cantReg].valor,"-\0");
-        tb[cantReg].tipo[0] ='-';
-        tb[cantReg].tipo[1] ='\0'; 
-        tb[cantReg].longitud = 0;
-        //printf("\nNombre : %s   -   Valor : %s -   longitud :    %d\n",tb[cantReg].nombre,tb[cantReg].valor,tb[cantReg].longitud);
-        cantReg++;
-    }
+//     int duplicados = 0,j;
+//     for ( j=0 ;j< cantReg; j++)
+//     {
+//         if(strcmp(text,(tb[j].nombre)+1)==0)
+//             duplicados = 1;      
+//     }
+//     if(!duplicados)
+//     {
+//         int tamanio=strlen(text),i;
+//         char aux[tamanio+2];
+//         aux[0]='_';
+//         for (i=1; i<= tamanio ; i++ )
+//         {
+//             aux[i]=*(text+i-1);
+//         }
+//         aux[tamanio+1]='\0';
+//         strcpy(tb[cantReg].nombre,aux);
+//         strcpy(tb[cantReg].valor,"-\0");
+//         tb[cantReg].tipo[0] ='-';
+//         tb[cantReg].tipo[1] ='\0'; 
+//         tb[cantReg].longitud = 0;
+//         //printf("\nNombre : %s   -   Valor : %s -   longitud :    %d\n",tb[cantReg].nombre,tb[cantReg].valor,tb[cantReg].longitud);
+//         cantReg++;
+//     }
   
-}
+// }
 
 
-void cargarVecTablaString(char * text)
-{  
+// void cargarVecTablaString(char * text)
+// {  
 
-        int duplicados = 0,j;
-        int i=0 ;
-        char aux [strlen(text)+1];
-        strcpy(aux,text);
-        aux[0] = '_';
-        for (i=0; i<= strlen(text) ; i++ )
-        {
-            if(aux[i] == ' ')
-                aux[i]= '_';
-        }
-        aux[i-2]='\0';
-        for ( j=0 ;j < cantReg; j++)
-        {
-            if(strcmp(aux,tb[j].nombre)==0)
-            duplicados = 1;      
-        }
-        if(!duplicados){
-            strcpy(tb[cantReg].nombre,aux);
-            strcpy(tb[cantReg].valor,text);
-            tb[cantReg].tipo[0] ='-';
-            tb[cantReg].tipo[1] ='\0';
-            tb[cantReg].longitud = strlen(text)-2;
-            cantReg++;
-        //printf("\nNombre : %s   -   Valor : %s -   longitud :    %d\n",tb[cantReg-1].nombre , tb[cantReg-1].valor,tb[cantReg-1].longitud);
-        }
+//         int duplicados = 0,j;
+//         int i=0 ;
+//         char aux [strlen(text)+1];
+//         strcpy(aux,text);
+//         aux[0] = '_';
+//         for (i=0; i<= strlen(text) ; i++ )
+//         {
+//             if(aux[i] == ' ')
+//                 aux[i]= '_';
+//         }
+//         aux[i-2]='\0';
+//         for ( j=0 ;j < cantReg; j++)
+//         {
+//             if(strcmp(aux,tb[j].nombre)==0)
+//             duplicados = 1;      
+//         }
+//         if(!duplicados){
+//             strcpy(tb[cantReg].nombre,aux);
+//             strcpy(tb[cantReg].valor,text);
+//             tb[cantReg].tipo[0] ='-';
+//             tb[cantReg].tipo[1] ='\0';
+//             tb[cantReg].longitud = strlen(text)-2;
+//             cantReg++;
+//         //printf("\nNombre : %s   -   Valor : %s -   longitud :    %d\n",tb[cantReg-1].nombre , tb[cantReg-1].valor,tb[cantReg-1].longitud);
+//         }
 
     
-}
+// }
