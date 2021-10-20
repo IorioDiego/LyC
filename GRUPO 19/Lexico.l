@@ -32,7 +32,7 @@ char *yytext;
 int yylex();
 int yyparse();
 char * yyerror();
-extern int cantReg=0;
+
 
 char* validarRangoString( char *text );
 char* validarRangoEntero( char *text );
@@ -189,8 +189,8 @@ OP_RESTA                [-]
 
 int main(int argc,char *argv[])
 {
-    printf("HOLAAAAAAAAAAAAA");
-
+  //  printf("HOLAAAAAAAAAAAAA");
+    cantReg = 0;
     
     abrirTablaDeSimbolos();
     
@@ -222,7 +222,7 @@ char* validarRangoString( char *text ){
             return yyerror();
     }
 else{
-            // cargarVecTablaString(text);
+        
           return text;
 }
 }
@@ -236,7 +236,7 @@ char* validarRangoID( char *text ){
 }
 else{
 
-        // cargarVecTablaID(text);
+  
           return text;
     } 
 }
@@ -262,7 +262,7 @@ printf("Valor del entero : %s\n",text+1 );
         }
    
     }
-//  cargarVecTablaNumero(text);
+
  return text;
 }
 
@@ -274,7 +274,7 @@ char* validarRangoReal( char *text ){
             return yyerror();
         }
         else{
-        //  cargarVecTablaNumero(text);
+
           return text;
         }
    
@@ -295,7 +295,7 @@ void escribirTablaSimbolos()
 { 
     int i;
     fprintf(fpTabla,"NOMBRE\t\t\tTIPO\t\t\tVALOR\t\t\tLONGITUD\n");
-    for(i = 0 ; i < cantReg; i++)
+    for(i = 0 ; i < (cantReg); i++)
     {
         fprintf(fpTabla,"%-s\t\t\t%-s\t\t\t%-s\t\t\t%-d\n",tb[i].nombre ,tb[i].tipo ,tb[i].valor,tb[i].longitud);
     }

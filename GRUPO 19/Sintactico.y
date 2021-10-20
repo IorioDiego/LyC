@@ -12,7 +12,7 @@ int yylex();
 int yyparse();
 int yyerror();
 char * yytext;
-extern int cantReg;
+
 
 void escribirTablaSimbolos();
 void cargarVecTablaString(char * text);
@@ -59,12 +59,12 @@ sentencia:
 
 
 declaracion:
-    DECVAR {cantReg=0;} dec ENDDECVAR    {printf("\nREGLA 10: <declaracion> --> DECVAR DIM <dec> ENDDECVAR\n");};    
+    DECVAR  dec ENDDECVAR    {printf("\nREGLA 10: <declaracion> --> DECVAR DIM <dec> ENDDECVAR\n");};    
 
   
 listavar:
     ID                              {cargarVecTablaID(yytext);printf("\nCANTIDDD DE REGISTROS >>>>>>>>>>>> %d\n", cantReg);printf("\nREGLA 11: <listavar> --> ID \n");}
-    | listavar COMA ID             {cargarVecTablaID(yytext);printf("\nREGLA 12: <listavar> --> <listavar> COMA ID\n");};
+    | listavar COMA ID             {cargarVecTablaID(yytext);printf("\nCANTIDDD DE REGISTROS >>>>>>>>>>>> %d\n", cantReg);printf("\nREGLA 12: <listavar> --> <listavar> COMA ID\n");};
 
 listatipodato:
     tipodato                        {printf("\nREGLA 13: <listatipodato> --> <tipodato> \n");}
@@ -86,7 +86,7 @@ entrada:
     GET ID                                          {printf("\nREGLA 21: <entrada> --> GET <factor>\n");};
 
 salida:
-    DISPLAY CONST_STR                                   {cargarVecTablaString(yylval.str_val);printf("\nREGLA 22: <salida> -->  DISPLAY CONST_STR  \n");};
+    DISPLAY CONST_STR                                   {cargarVecTablaString(yytext);printf("\nREGLA 22: <salida> -->  DISPLAY CONST_STR  \n");};
 
 asignacion:
     ID OP_ASIG expresion                                {printf("\nREGLA 23: <asignacion> --> ID OP_ASIG <expresion> \n");};
@@ -122,9 +122,9 @@ lista:
 
 factor:
     PAR_A expresion PAR_C       {printf("\nREGLA 41: <factor> --> PAR_A <expresion> PAR_C\n");} 
-    | CONST_REAL                {printf("\nREGLA 42: <factor> --> CONST_REAL\n");} 
+    | CONST_REAL                {cargarVecTablaNumero(yytext);printf("\nREGLA 42: <factor> --> CONST_REAL\n");} 
     | ID                        {printf("\nREGLA 43: <factor> --> ID\n");} 
-    | CONST_ENT                 {printf("\nREGLA 44: <factor> --> CONST_ENT\n");};
+    | CONST_ENT                 {cargarVecTablaNumero(yytext);printf("\nREGLA 44: <factor> --> CONST_ENT\n");};
 
 comparador:
     OP_MAY          {printf("\nREGLA 45: <comparador> --> OP_MAY\n");} 
@@ -147,7 +147,7 @@ dec:
 void cargarVecTablaNumero(char * text)
 {
    int duplicados = 0,j;
-    for ( j=0 ;j< cantReg; j++)
+    for ( j=0 ;j< (cantReg); j++)
     {
         if(strcmp(text,(tb[j].nombre)+1)==0)
             duplicados = 1;      
@@ -170,7 +170,7 @@ void cargarVecTablaNumero(char * text)
         tb[cantReg].longitud = 0;
         //printf("\nNombre : %s   -   Valor : %s -   longitud :    %d\n",tb[cantReg].nombre , tb[cantReg].valor,tb[cantReg].longitud);
 
-        cantReg++;
+        (cantReg)++;
     }
 
 
@@ -181,7 +181,7 @@ void cargarVecTablaID(char * text)
 {
     
     int duplicados = 0,j;
-    for ( j=0 ;j< cantReg; j++)
+    for ( j=0 ;j< (cantReg); j++)
     {
         if(strcmp(text,(tb[j].nombre)+1)==0)
             duplicados = 1;      
@@ -202,7 +202,7 @@ void cargarVecTablaID(char * text)
         tb[cantReg].tipo[1] ='\0'; 
         tb[cantReg].longitud = 0;
         //printf("\nNombre : %s   -   Valor : %s -   longitud :    %d\n",tb[cantReg].nombre,tb[cantReg].valor,tb[cantReg].longitud);
-        cantReg++;
+        (cantReg)++;
     }
   
 }
@@ -222,7 +222,7 @@ void cargarVecTablaString(char * text)
                 aux[i]= '_';
         }
         aux[i-2]='\0';
-        for ( j=0 ;j < cantReg; j++)
+        for ( j=0 ;j < (cantReg); j++)
         {
             if(strcmp(aux,tb[j].nombre)==0)
             duplicados = 1;      
@@ -233,7 +233,7 @@ void cargarVecTablaString(char * text)
             tb[cantReg].tipo[0] ='-';
             tb[cantReg].tipo[1] ='\0';
             tb[cantReg].longitud = strlen(text)-2;
-            cantReg++;
+            (cantReg)++;
         //printf("\nNombre : %s   -   Valor : %s -   longitud :    %d\n",tb[cantReg-1].nombre , tb[cantReg-1].valor,tb[cantReg-1].longitud);
         }
 
