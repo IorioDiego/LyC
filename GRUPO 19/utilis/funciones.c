@@ -6,63 +6,107 @@
 //////////////////////////////////////////////////////////////////////////////////
 ///PRIMITIVAS
 //////////////////////////////////////////////////////////////////////////////////
-void crearPila(t_pila *pp)
+
+void crearPila(tPila * p)
 {
-    *pp = NULL;
-}
-//////////////////////////////////////////////////////////////////////////////////
-int meterEnPila(t_pila *pp, StackItem *pi)
-{
-    t_nodo_pila *pn = (t_nodo_pila *)malloc(sizeof(t_nodo_pila));
-    if (!pn)
-        return 0;
-    pn -> dato = *pi;
-    pn -> psig = *pp;
-    *pp = pn;
-    return 1;
-}
-//////////////////////////////////////////////////////////////////////////////////
-int sacarDePila(t_pila *pp, StackItem *pi)
-{
-    t_nodo_pila *pn;
-    if (!*pp)
-        return 0;
-    pn = *pp;
-    *pi = (*pp)->dato; //Para que guarda este dato si lo va a sacar?//Es para mostrar en un printf "se saco este dato"??
-    *pp = (*pp)->psig;
-    free(pn);
-    return 1;
-}
-//////////////////////////////////////////////////////////////////////////////////
-int esPilaVacia(const t_pila *pp)
-{
-    return *pp == NULL;
-}
-//////////////////////////////////////////////////////////////////////////////////
-int esPilaLlena(const t_pila *pp)
-{
-    t_nodo_pila *pn = (t_nodo_pila *)malloc(sizeof(t_nodo_pila)); //Crea un nodo, el cual hace que sea apuntado por pn.
-    free(pn);                                                     //Si hay memoria, el puntero pn va a existir, por ende libera la memoria para no desperdiciarla.
-    return pn == NULL;                                            //Pregunta si el puntero pn se creo.
-}
-//////////////////////////////////////////////////////////////////////////////////
-int tope_de_pila(const t_pila *pp, StackItem *pi)
-{
-    if (!*pp)
-        return 0;
-    *pi = (*pp)->dato;
-    return 0;
+    *p=NULL;
 }
 
-void vaciarPila(t_pila *pp)
+//int  pilaLlena(const tPila *p,unsigned cantBytes)
+//{
+//    tNodo * nue;
+//    nue=(tNodo*)malloc(sizeof(cantBytes));
+//    if(!nue)
+//        return 0;
+//    free(nue);
+//    return 1;
+//}
+
+int  pilaLlena(const tPila *p,unsigned cantBytes)
 {
-    t_nodo_pila *pn;
-    while (*pp)
+    tNodo * nue=(tNodo*)malloc(sizeof(tNodo));
+    void* info=malloc(cantBytes);
+    free(nue);
+    free(info);
+    return nue==NULL || info==NULL;
+}
+
+
+
+int pilaVacia(const tPila* p)
+{
+    return *p==NULL;
+}
+
+int ponerEnPila(tPila *p,const void *d,unsigned cantBytes)
+{
+    tNodo * nue;
+    nue=(tNodo*)malloc(sizeof(tNodo));
+    if(!nue)
+        return 0;
+    nue->info=malloc(cantBytes);
+    if(!nue->info)
+        {
+            free(nue);
+            return 0;
+        }
+    memcpy(nue->info,d,cantBytes);
+    nue->tamInfo=cantBytes;
+    nue->sig=*p;
+    *p=nue;
+    return 1;
+}
+
+int sacarDePila(tPila* p, void *d,unsigned cantBytes)
+{
+    unsigned min;
+    tNodo* aux = *p;
+    if(*p==NULL)
+        return 0;
+    if(cantBytes> aux->tamInfo)
+        min=aux->tamInfo;
+    else
+        min=cantBytes;
+    *p=aux->sig;
+    memcpy(d,aux->info,min);
+    free(aux->info);
+    free(aux);
+    return 1;
+}
+
+void vaciarPila(tPila *p)
+{
+    tNodo *aux = *p;
+    while(*p)
     {
-        pn = *pp;
-        *pp = (*pp)->psig;
-        printf("\n%s\n", pn->dato.value);
-        free(pn);
+        aux = *p;
+        *p=aux->sig;
+        free(aux->info);
+        free(aux);
     }
 }
+
+int verTope(const tPila * p,void *d, unsigned cantBytes)
+{
+    unsigned min;
+    tNodo* aux = *p;
+    if(*p==NULL)
+        return 0;
+    if(cantBytes> aux->tamInfo)
+        min=aux->tamInfo;
+    else
+        min=cantBytes;
+    memcpy(d,aux->info,min);
+    return 1;
+}
+
+
+
+
+
+
+
+
+
+
 

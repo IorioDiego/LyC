@@ -2,7 +2,10 @@
 #define FUNCIONES_H
 
 
-
+#define STR_LIMITE 100
+#define ID_LIMITE 30
+#define ENT_LIMITE 5
+#define TABLA_SIMBOLOS_TXT "ts.txt"
 
 #define SIN_MEMORIA 0
 #define COLA_VACIA 0
@@ -21,44 +24,38 @@ typedef struct
 
 }tablaSimbolos;
 
+
+
+
+// ESTRUCTURA DE PILA
+
+typedef struct sNodo
+{
+    void           *info;
+    unsigned        tamInfo;
+    struct sNodo   *sig;
+} tNodo;
+typedef tNodo *tPila;
+
+void crearPila(tPila *p);
+int  pilaLlena(const tPila *p, unsigned cantBytes);
+int  ponerEnPila(tPila *p, const void *d, unsigned cantBytes);
+int  verTope(const tPila *p, void *d, unsigned cantBytes);
+int  pilaVacia(const tPila *p);
+int  sacarDePila(tPila *p, void *d, unsigned cantBytes);
+void vaciarPila(tPila *p);
+
+
+////////Variables///////
+tPila pTipoDato;
+tPila pVariable;
+
+
 tablaSimbolos tb[2000];
 int cantReg;
 FILE * fpTabla;
 char aux[1000] ;
 
-
-// ESTRUCTURA DE PILA
-typedef struct tagStackItem
-{
-    char value[30];
-    struct tagSExpression *estructura;
-} StackItem;
-
-
-typedef struct s_nodo_pila
-{
-    StackItem dato;
-    struct s_nodo_pila *psig;
-} t_nodo_pila;
-
-typedef t_nodo_pila *t_pila;
-
-///TIPOS DE FUNCION
-typedef void (*t_mostrar)(const void *);
-
-///PRIMITIVAS
-void crearPila(t_pila *);
-void vaciar_pila(t_pila *);
-int meterEnPila(t_pila *, StackItem *);
-int sacarDePila(t_pila *, StackItem *);
-int esPilaVacia(const t_pila *);
-int esPilaLlena(const t_pila *);
-void vaciarPila(t_pila *);
-int tope_de_pila(const t_pila *, StackItem *);
-
-
-
 ///OTRAS FUNCIONES
-void mostrar_pila(const t_pila *, StackItem);
 
 #endif // PRIMITIVAS_H_INCLUDED

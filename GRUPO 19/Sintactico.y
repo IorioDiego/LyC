@@ -2,6 +2,9 @@
 #include "utilis/funciones.h"
 #include "y.tab.h"
 
+#define LONG_TIPO_FLOAT 10
+#define LONG_TIPO_INTEGER 10
+#define LONG_TIPO_STR 10
 
 
 
@@ -59,21 +62,21 @@ sentencia:
 
 
 declaracion:
-    DECVAR  dec ENDDECVAR    {printf("\nREGLA 10: <declaracion> --> DECVAR DIM <dec> ENDDECVAR\n");};    
+    DECVAR  dec ENDDECVAR    {cargarVecTablaID("hola");printf("\nREGLA 10: <declaracion> --> DECVAR DIM <dec> ENDDECVAR\n");};    
 
   
 listavar:
-    ID                              {cargarVecTablaID(yytext);printf("\nCANTIDDD DE REGISTROS >>>>>>>>>>>> %d\n", cantReg);printf("\nREGLA 11: <listavar> --> ID \n");}
-    | listavar COMA ID             {cargarVecTablaID(yytext);printf("\nCANTIDDD DE REGISTROS >>>>>>>>>>>> %d\n", cantReg);printf("\nREGLA 12: <listavar> --> <listavar> COMA ID\n");};
+    ID                              {ponerEnPila(&pVariable,yytext,30);printf("\nCANTIDDD DE REGISTROS >>>>>>>>>>>> %d\n", cantReg);printf("\nREGLA 11: <listavar> --> ID \n");}
+    | listavar COMA ID             {ponerEnPila(&pVariable,yytext,30);printf("\nCANTIDDD DE REGISTROS >>>>>>>>>>>> %d\n", cantReg);printf("\nREGLA 12: <listavar> --> <listavar> COMA ID\n");};
 
 listatipodato:
     tipodato                        {printf("\nREGLA 13: <listatipodato> --> <tipodato> \n");}
     | listatipodato COMA tipodato  {printf("\nREGLA 14: <listatipodato> --> <listatipodato> COMA <tipodato>\n");};
 
 tipodato:
-    INTEGER                         {printf("\nREGLA 15: <tipodato> --> INTEGER  \n");}
-    | FLOAT                         {printf("\nREGLA 16: <tipodato> --> FLOAT \n");}
-    | STRING                        {printf("\nREGLA 17: <tipodato> --> STRING \n");};
+    INTEGER                         {ponerEnPila(&pTipoDato,yytext,LONG_TIPO_INTEGER);printf("\nREGLA 15: <tipodato> --> INTEGER  \n");}
+    | FLOAT                         {ponerEnPila(&pTipoDato,yytext,LONG_TIPO_FLOAT);printf("\nREGLA 16: <tipodato> --> FLOAT \n");}
+    | STRING                        {ponerEnPila(&pTipoDato,yytext,LONG_TIPO_STR);printf("\nREGLA 17: <tipodato> --> STRING \n");};
 
 seleccion:
     IF condicion THEN programa ELSE programa ENDIF      {printf("\nREGLA 18: <seleccion> --> IF <condicion> THEN <programa> ELSE <programa> ENDIF\n");}
@@ -146,6 +149,7 @@ dec:
 
 void cargarVecTablaNumero(char * text)
 {
+
    int duplicados = 0,j;
     for ( j=0 ;j< (cantReg); j++)
     {
@@ -177,32 +181,48 @@ void cargarVecTablaNumero(char * text)
 
 }
 
-void cargarVecTablaID(char * text)
+
+
+
+
+void cargarVecTablaID(char * t)
 {
-    
-    int duplicados = 0,j;
-    for ( j=0 ;j< (cantReg); j++)
+    while(!pilaVacia(&pVariable))
     {
-        if(strcmp(text,(tb[j].nombre)+1)==0)
-            duplicados = 1;      
-    }
-    if(!duplicados)
-    {
-        int tamanio=strlen(text),i;
-        char aux[tamanio+2];
-        aux[0]='_';
-        for (i=1; i<= tamanio ; i++ )
+        char vari[100];
+        char tipoD[100];
+        char* text;
+        char * tDat;
+        text =vari;
+        tDat =tipoD;
+        sacarDePila(&pVariable,vari,100);
+        sacarDePila(&pTipoDato,tipoD,100);
+        int duplicados = 0,j;
+        for ( j=0 ;j< (cantReg); j++)
         {
-            aux[i]=*(text+i-1);
+            if(strcmp(text,(tb[j].nombre)+1)==0)
+                duplicados = 1;      
         }
-        aux[tamanio+1]='\0';
-        strcpy(tb[cantReg].nombre,aux);
-        strcpy(tb[cantReg].valor,"-\0");
-        tb[cantReg].tipo[0] ='-';
-        tb[cantReg].tipo[1] ='\0'; 
-        tb[cantReg].longitud = 0;
-        //printf("\nNombre : %s   -   Valor : %s -   longitud :    %d\n",tb[cantReg].nombre,tb[cantReg].valor,tb[cantReg].longitud);
-        (cantReg)++;
+        if(!duplicados)
+        {
+            int tamanio=strlen(text),i;
+            char aux[tamanio+2];
+            aux[0]='_';
+            for (i=1; i<= tamanio ; i++ )
+            {
+                aux[i]=*(text+i-1);
+            }
+            aux[tamanio+1]='\0';
+            strcpy(tb[cantReg].nombre,aux);
+            strcpy(tb[cantReg].valor,"-\0");
+            // tb[cantReg].tipo[0] ='-';
+            // tb[cantReg].tipo[1] ='\0'; 
+            strcpy(tb[cantReg].tipo,tDat);
+            tb[cantReg].longitud = 0;
+            //printf("\nNombre : %s   -   Valor : %s -   longitud :    %d\n",tb[cantReg].nombre,tb[cantReg].valor,tb[cantReg].longitud);
+            (cantReg)++;
+        }
+
     }
   
 }

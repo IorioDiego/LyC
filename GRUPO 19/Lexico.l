@@ -4,10 +4,8 @@
 #include "y.tab.h"
 #include "utilis/funciones.h"
 
-#define STR_LIMITE 100
-#define ID_LIMITE 30
-#define ENT_LIMITE 5
-#define TABLA_SIMBOLOS_TXT "ts.txt"
+
+
 
 #define COTA_INFERIOR_ENT -32768
 #define COTA_SUPERIOR_ENT 32767
@@ -191,7 +189,9 @@ int main(int argc,char *argv[])
 {
   //  printf("HOLAAAAAAAAAAAAA");
     cantReg = 0;
-    
+  crearPila(&pTipoDato);
+  crearPila(&pVariable);
+
     abrirTablaDeSimbolos();
     
 if ((yyin = fopen(argv[1], "rt")) == NULL)
@@ -294,10 +294,11 @@ int abrirTablaDeSimbolos()
 void escribirTablaSimbolos()
 { 
     int i;
-    fprintf(fpTabla,"NOMBRE\t\t\tTIPO\t\t\tVALOR\t\t\tLONGITUD\n");
+    fprintf(fpTabla, "%-30s\t\t\t%-30s\t\t\t%-30s\t\t\t%s\n", "NOMBRE", "TIPO", "VALOR", "LONGITUD");
+    
     for(i = 0 ; i < (cantReg); i++)
     {
-        fprintf(fpTabla,"%-s\t\t\t%-s\t\t\t%-s\t\t\t%-d\n",tb[i].nombre ,tb[i].tipo ,tb[i].valor,tb[i].longitud);
+        fprintf(fpTabla,"%-30s\t\t\t%-30s\t\t\t%-30s\t\t\t%-d\n",tb[i].nombre ,tb[i].tipo ,tb[i].valor,tb[i].longitud);
     }
 }
 
