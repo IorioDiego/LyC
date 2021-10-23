@@ -135,15 +135,7 @@ int ponerEnCola(tCola *c, const void *d, unsigned cantBytes)
     
     memcpy(nue->infoC,d, cantBytes);
 
-    // printf("NUMERO TERCETO : %d\n",((t_Terceto*)d)->numTerceto);
-    // printf("PRIEMERA POS TERCETO : %s\n",((t_Terceto*)d)->posUno);
-    // printf("SEGUDA POS TERCETO : %s\n",((t_Terceto*)d)->posDos);
-    // printf("TERCERTA POS TERCETO : %s\n",((t_Terceto*)d)->posTres);
 
-    // printf("NUMERO TERCETO BIS : %d\n",((t_Terceto*)nue->infoC)->numTerceto);
-    // printf("PRIEMERA POS TERCETO  BIS: %s\n",((t_Terceto*)nue->infoC)->posUno);
-    // printf("SEGUDA POS TERCETO BIS: %s\n",((t_Terceto*)nue->infoC)->posDos);
-    // printf("TERCERTA POS TERCETO BIS : %s\n",((t_Terceto*)nue->infoC)->posTres);
 
     nue->tamInfoC = cantBytes;
     nue->sigC = NULL;
@@ -190,7 +182,7 @@ int sacarDeCola(tCola *c, void *d, unsigned cantBytes)
     c->priC = elim->sigC;
 
     memcpy(d,elim->infoC,minimo( elim->tamInfoC, cantBytes));
-   printf("NUMERO TERCETO : %d\n",((t_Terceto*)elim->infoC)->numTerceto);
+
 
     free(elim->infoC);
     free(elim);

@@ -49,15 +49,6 @@ int  pilaVacia(const tPila *p);
 int  sacarDePila(tPila *p, void *d, unsigned cantBytes);
 void vaciarPila(tPila *p);
 
-//////////////lists///////////
-typedef struct lNodo
-{
-    unsigned    cantBytes;
-    void*   d;
-    struct sNodo* sig;
-
-}lNodo;
-typedef lNodo* tLista;
 
 
 
@@ -110,6 +101,11 @@ typedef struct
 //-Pila
 tPila pTipoDato;
 tPila pVariable;
+tPila pilaNroTerceto;
+
+tPila pilaLista;
+
+
 //-Cola
 tCola  colaTercetos;
 

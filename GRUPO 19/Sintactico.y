@@ -6,6 +6,9 @@
 #define LONG_TIPO_INTEGER 10
 #define LONG_TIPO_STR 10
 
+#define LONG_TERCETO 30 
+
+
 
 
 int yystopparser=0;
@@ -41,10 +44,14 @@ int     sentInd=0,
         tipoDatoInd=0;
         
 
+int contList;
+int tercetosCreados=1;
+char comparador[4];
 
-int tercetosCreados=0;
-
-int crearTerceto(char* c1,char *c2,char *c3 );
+int crearTerceto(char* c1,char *c2,char *c3 ,int nroT);
+int desapilarNroTerceto();
+void escribirTercetoActualEnAnterior(int tercetoAEscribir,int tercetoBuscado);
+int desapilarNroTerceto();
 
 
 void escribirTablaSimbolos();//Sacar
@@ -113,7 +120,36 @@ seleccion:
     | IF condicion THEN programa ENDIF                  {printf("\nREGLA 19: <seleccion> --> IF <condicion> THEN <programa> ENDIF \n");};
 
 ciclo:
-    WHILE ID IN COR_A lista COR_C DO programa ENDWHILE         {printf("\nREGLA 20: <ciclo> --> WHILE ID IN COR_A <lista> COR_C DO <sentencia> ENDWHILE\n");};
+    WHILE ID            {
+                            crearTerceto(yytext,"_","_",tercetosCreados);
+                        }
+                 
+
+    IN COR_A lista      {   
+                            cicloInd = crearTerceto("ETW","_","_",tercetosCreados);
+                            apilarNroTerceto(cicloInd);
+
+                            apilarNroTerceto(tercetosCreados-1);}//revisar si va aca 
+    COR_C DO programa   {
+                             crearTerceto("CMP", "NULL","PILA",tercetosCreados  );
+                            int t = desapilarNroTerceto();
+                            char auxT [4]; 
+                            char auxLista[4];
+                            sprintf(auxT,"[%d]",t);
+                            sprintf(auxLista,"[%d]",listaInd);
+                            crearTerceto(":=",auxT,auxLista,tercetosCreados);
+
+                             escribirTercetoActualEnAnterior(tercetosCreados+1,t);
+                            t = desapilarNroTerceto(); 
+                           
+                          
+                            crearTerceto("BI",auxT,"_",tercetosCreados);
+                            escribirTercetoActualEnAnterior(tercetosCreados,t);
+
+                        }
+                      
+
+    ENDWHILE         {printf("\nREGLA 20: <ciclo> --> WHILE ID IN COR_A <lista> COR_C DO <sentencia> ENDWHILE\n");};
 
 entrada:
     GET ID                                          {printf("\nREGLA 21: <entrada> --> GET <factor>\n");};
@@ -122,7 +158,14 @@ salida:
     DISPLAY CONST_STR                                   {cargarVecTablaString(yytext);printf("\nREGLA 22: <salida> -->  DISPLAY CONST_STR  \n");};
 
 asignacion:
-    ID OP_ASIG expresion                                {printf("\nREGLA 23: <asignacion> --> ID OP_ASIG <expresion> \n");};
+    ID {asignacionInd = crearTerceto(yytext,"_","_",tercetosCreados);} OP_ASIG expresion {
+                                                           
+                                                            char auxAsig[LONG_TERCETO];
+                                                           char auxInd[LONG_TERCETO];
+                                                           sprintf(auxInd,"[%d]",expInd );
+                                                            sprintf(auxAsig,"[%d]",asignacionInd);
+                                                      
+                                                            asignacionInd = crearTerceto("OP_ASIG",auxAsig,auxInd,tercetosCreados); printf("\nREGLA 23: <asignacion> --> ID OP_ASIG <expresion> \n");};
 
 condicion:
     comparacion
@@ -135,37 +178,64 @@ comparacion:
     expresion comparador expresion                     {printf("\nREGLA 28: <comparacion> --> <expresion><comparador><expresion> \n");};
 
 expresion:
-    expresion OP_SUMA termino                           {printf("\nREGLA 29: <expresion> --> <expresion>OP_SUMA<termino> \n");}
-    | expresion OP_RESTA termino                        {printf("\nREGLA 30: <expresion> --> <expresion>OP_RESTA<termino> \n");}
-    | termino                                           {printf("\nREGLA 31: <expresion> --> <termino> \n");}
-    |OP_RESTA expresion %prec MENOS_UNARIO               {printf("\nREGLA 32: <expresion> --> OP_RESTA <expresion> \n");}                               
-    |longitud                                            {printf("\nREGLA 33: <expresion> --> <longitud> \n");};      
+    expresion OP_SUMA termino                           {   
+                                                            char auxTer[LONG_TERCETO];
+                                                            char auxExp[LONG_TERCETO];
+                                                            sprintf(auxTer,"[%d]",termInd);
+                                                            sprintf(auxExp,"[%d]",expInd);
+                                                            expInd = crearTerceto("OP_SUMA",auxExp,auxTer,tercetosCreados);  
+                                                            printf("\nREGLA 29: <expresion> --> <expresion>OP_SUMA<termino> \n");}
+
+    | expresion OP_RESTA termino                        {   char auxTer[LONG_TERCETO];
+                                                            char auxExp[LONG_TERCETO];
+                                                            sprintf(auxTer,"[%d]",termInd);
+                                                            sprintf(auxExp,"[%d]",expInd);
+                                                            expInd = crearTerceto("OP_RESTA",auxExp,auxTer,tercetosCreados);  
+                                                            printf("\nREGLA 30: <expresion> --> <expresion>OP_RESTA<termino> \n");}
+
+    | termino                                           {   expInd = termInd; printf("\nREGLA 31: <expresion> --> <termino> \n");}
+
+    |OP_RESTA expresion %prec MENOS_UNARIO              {   char auxExp[LONG_TERCETO];
+                                                            sprintf(auxExp,"[%d]",expInd);
+                                                            expInd = crearTerceto("OP_RESTA", auxExp,"_",tercetosCreados);
+                                                            printf("\nREGLA 32: <expresion> --> OP_RESTA <expresion> \n");}                               
+    |longitud                                           {   expInd = longInd ;printf("\nREGLA 33: <expresion> --> <longitud> \n");};      
     
 termino:
-    termino OP_MULT factor                              {printf("\nREGLA 35: <termino> --> <termino>OP_MULT<factor> \n");}
-    | termino OP_DIV factor                             {printf("\nREGLA 36: <termino> --> <termino>OP_DIV<factor> \n");}
-    | factor                                            {printf("\nREGLA 37: <termino> --> <factor> \n");};
+    termino OP_MULT factor                              {   char auxTer[LONG_TERCETO];
+                                                            char auxFac[LONG_TERCETO];
+                                                            sprintf(auxTer,"[%d]",termInd);
+                                                            sprintf(auxFac,"[%d]",factInd);
+                                                            termInd = crearTerceto("OP_MULT",auxTer,auxFac,tercetosCreados);   
+                                                            printf("\nREGLA 35: <termino> --> <termino>OP_MULT<factor> \n");}
+    | termino OP_DIV factor                             {   char auxTer[LONG_TERCETO];
+                                                            char auxFac[LONG_TERCETO];
+                                                            sprintf(auxTer,"[%d]",termInd);
+                                                            sprintf(auxFac,"[%d]",factInd);
+                                                            termInd = crearTerceto("OP_DIV",auxTer,auxFac,tercetosCreados);                                              
+                                                            printf("\nREGLA 36: <termino> --> <termino>OP_DIV<factor> \n");}
+    | factor                                            {   termInd = factInd ;printf("\nREGLA 37: <termino> --> <factor> \n");};
 
 longitud:
-    LONG PAR_A lista PAR_C                    {printf("\nREGLA 38: <longitud> --> <ID>OP_ASIF<LONG>PAR_A<lista>PAR_C\n");};
+    LONG PAR_A lista PAR_C                    {longInd = listaInd ; printf("\nREGLA 38: <longitud> --> <ID>OP_ASIF<LONG>PAR_A<lista>PAR_C\n");};
 
 lista:
-    factor                                              {printf("\nREGLA 39: <lista> --> <factor> \n");}
-    | lista COMA factor                                 {printf("\nREGLA 40: <lista> --> <lista>COMA<factor> \n");};
+    factor                                              {listaInd = factInd; contList=1;printf("\nREGLA 39: <lista> --> <factor> \n");}
+    | lista COMA factor                                 {listaInd = factInd; contList++;printf("\nREGLA 40: <lista> --> <lista>COMA<factor> \n");};
 
 factor:
-    PAR_A expresion PAR_C       {printf("\nREGLA 41: <factor> --> PAR_A <expresion> PAR_C\n");} 
-    | CONST_REAL                {crearTerceto(yytext,"_","_");cargarVecTablaNumero(yytext);printf("\nREGLA 42: <factor> --> CONST_REAL\n");} 
-    | ID                        {printf("\nREGLA 43: <factor> --> ID\n");} 
-    | CONST_ENT                 {crearTerceto(yytext,"_","_");cargarVecTablaNumero(yytext);printf("\nREGLA 44: <factor> --> CONST_ENT\n");};
+    PAR_A expresion PAR_C       {factInd = expInd; printf("\nREGLA 41: <factor> --> PAR_A <expresion> PAR_C\n");} 
+    | CONST_REAL                {factInd = crearTerceto(yytext,"_","_", tercetosCreados);cargarVecTablaNumero(yytext);printf("\nREGLA 42: <factor> --> CONST_REAL\n");} 
+    | ID                        {factInd = crearTerceto(yytext,"_","_",tercetosCreados);printf("\nREGLA 43: <factor> --> ID\n");} 
+    | CONST_ENT                 {factInd = crearTerceto(yytext,"_","_", tercetosCreados);cargarVecTablaNumero(yytext);printf("\nREGLA 44: <factor> --> CONST_ENT\n");};
 
 comparador:
-    OP_MAY          {printf("\nREGLA 45: <comparador> --> OP_MAY\n");} 
-    | OP_MEN        {printf("\nREGLA 46: <comparador> --> OP_MEN\n");} 
-    | OP_MENIGU     {printf("\nREGLA 47: <comparador> --> OP_MENIGU\n");} 
-    | OP_MAYIGU     {printf("\nREGLA 48: <comparador> --> OP_MAYIGU\n");} 
-    | OP_IGUAL      {printf("\nREGLA 49: <comparador> --> OP_IGUAL\n");} 
-    | OP_DIF        {printf("\nREGLA 10: <comparador> --> OP_DIF\n");};
+    OP_MAY          {strcpy(comparador, "BLE");printf("\nREGLA 45: <comparador> --> OP_MAY\n");} 
+    | OP_MEN        {strcpy(comparador, "BGE");printf("\nREGLA 46: <comparador> --> OP_MEN\n");} 
+    | OP_MENIGU     {strcpy(comparador,"BGT");printf("\nREGLA 47: <comparador> --> OP_MENIGU\n");} 
+    | OP_MAYIGU     {strcpy(comparador, "BLT") ;printf("\nREGLA 48: <comparador> --> OP_MAYIGU\n");} 
+    | OP_IGUAL      {strcpy(comparador,"BNE" );printf("\nREGLA 49: <comparador> --> OP_IGUAL\n");} 
+    | OP_DIF        {strcpy(comparador,"BNQ" );printf("\nREGLA 10: <comparador> --> OP_DIF\n");};
 
 dec:
     dec DIM COR_A listavar COR_C AS COR_A listatipodato COR_C   {printf("\nREGLA 49: <dec> --> <dec> COR_A listavar COR_C AS COR_A listatipodato COR_C\n");} 
@@ -291,11 +361,11 @@ void cargarVecTablaString(char * text)
 }
 
 
-int crearTerceto(char *c1, char*c2 ,char *c3){//Acordarme de apsar [ ] cuando paso un indice
-    tercetosCreados++;
+int crearTerceto(char *c1, char*c2 ,char *c3,int nroT){//Acordarme de apsar [ ] cuando paso un indice
+    
     t_Terceto tercetos;
-   
-    tercetos.numTerceto = tercetosCreados;
+    tercetosCreados++;
+    tercetos.numTerceto = nroT;
     strcpy(tercetos.posUno,c1);
     strcpy(tercetos.posDos,c2);
     strcpy(tercetos.posTres,c3);
@@ -303,5 +373,49 @@ int crearTerceto(char *c1, char*c2 ,char *c3){//Acordarme de apsar [ ] cuando pa
 
     ponerEnCola(&colaTercetos,&tercetos,sizeof(tercetos));
 
-    return tercetosCreados;
+    return nroT;
 }
+
+
+int apilarNroTerceto(int nroTerceto)
+{
+    return ponerEnPila(&pilaNroTerceto,&nroTerceto,sizeof(nroTerceto));
+    
+}
+
+int desapilarNroTerceto()
+{   
+    int  nroTerceto;
+    sacarDePila(&pilaNroTerceto,&nroTerceto,sizeof(nroTerceto));
+    return nroTerceto;
+}
+
+
+void escribirTercetoActualEnAnterior(int tercetoAEscribir,int tercetoBuscado)
+{
+    tCola  aux;
+    crearCola(&aux);
+    t_Terceto terceto;
+
+    
+ 
+    while(!colaVacia(&colaTercetos))
+    {
+           sacarDeCola(&colaTercetos,&terceto,sizeof(terceto));
+       
+
+        if(terceto.numTerceto == tercetoBuscado){
+                char nueComponente [4];/// ver bien tam del int, que suponemos q es 2 bytes
+                sprintf( nueComponente, "[%d]",tercetoAEscribir);
+                strcpy(terceto.posTres, nueComponente);
+        }
+        ponerEnCola(&aux,&terceto,sizeof(terceto));
+    }
+    
+    colaTercetos=aux;
+
+}
+
+
+
+

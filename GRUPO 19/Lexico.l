@@ -190,9 +190,11 @@ int main(int argc,char *argv[])
 {
   //  printf("HOLAAAAAAAAAAAAA");
     cantReg = 0;
-  crearPila(&pTipoDato);
-  crearPila(&pVariable);
+    crearPila(&pTipoDato);
+    crearPila(&pVariable);
 
+    crearPila(&pilaNroTerceto);
+    crearPila(&pilaLista);
     crearCola(&colaTercetos);
 
     abrirTablaDeSimbolos();//si abre mal no derbai abrir el resto
@@ -316,7 +318,7 @@ void escribirTercetosEnIntermedia()
       
         t_Terceto t;
         sacarDeCola(&colaTercetos,&t,100);
-        printf("DATPS: %s ", t.posUno); 
+   
         fprintf(fpIntermedia,"[%d] ( %s ; %s ; %s ) \n",t.numTerceto,t.posUno,t.posDos,t.posTres);
     }
 }

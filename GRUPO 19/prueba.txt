@@ -1,11 +1,8 @@
-var := 100
-
-var2 := 3
 
 
-var2 := 1245
-
-var2 := 23
-
-var2 := 676
-
+  WHILE var1 IN [ a , c , d]
+                DO
+                    var1 := var2 + 3
+              
+            ENDWHILE
+            
