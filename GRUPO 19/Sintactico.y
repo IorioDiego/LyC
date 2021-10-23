@@ -17,12 +17,42 @@ int yyerror();
 char * yytext;
 
 
-void escribirTablaSimbolos();
+/////////TERCETIS//////////
+///indices
+int     sentInd=0,
+        prgInd=0,
+        declaracionInd=0,
+        asignacionInd=0,
+        selecInd=0,
+        cicloInd=0,
+        longInd=0,
+        salidaInd=0,
+        entradaInd=0,
+        expInd=0,
+        factInd=0,
+        termInd=0,
+        listTipoDatoInd=0,
+        decInd=0,
+        listavarInd=0,
+        condInd=0,
+        comparacionInd=0,
+        comparadorInd=0,
+        listaInd=0,
+        tipoDatoInd=0;
+        
+
+
+int tercetosCreados=0;
+
+int crearTerceto(char* c1,char *c2,char *c3 );
+
+
+void escribirTablaSimbolos();//Sacar
 void cargarVecTablaString(char * text);
 void cargarVecTablaID(char * text);
 void cargarVecTablaNumero(char * text);
 void cargarVecTablaString(char * text);
-int abrirTablaDeSimbolos();
+int abrirTablaDeSimbolos();//Sacar
 
 
 
@@ -49,7 +79,7 @@ char *str_val;
 
 programa:
     sentencia                       {printf("\nREGLA 1: <programa> --> <sentencia>\n");}       
-    | programa sentencia            {printf("\nREGLA 2: <programa> --> <programa> <sentencia>\n");};              
+    | programa sentencia            {sentInd=prgInd;printf("\nREGLA 2: <programa> --> <programa> <sentencia>\n");};              
     
 sentencia:
      declaracion                     {printf("\nREGLA 3: <sentencia> --> <declaracion>\n");}  
@@ -125,9 +155,9 @@ lista:
 
 factor:
     PAR_A expresion PAR_C       {printf("\nREGLA 41: <factor> --> PAR_A <expresion> PAR_C\n");} 
-    | CONST_REAL                {cargarVecTablaNumero(yytext);printf("\nREGLA 42: <factor> --> CONST_REAL\n");} 
+    | CONST_REAL                {crearTerceto(yytext,"_","_");cargarVecTablaNumero(yytext);printf("\nREGLA 42: <factor> --> CONST_REAL\n");} 
     | ID                        {printf("\nREGLA 43: <factor> --> ID\n");} 
-    | CONST_ENT                 {cargarVecTablaNumero(yytext);printf("\nREGLA 44: <factor> --> CONST_ENT\n");};
+    | CONST_ENT                 {crearTerceto(yytext,"_","_");cargarVecTablaNumero(yytext);printf("\nREGLA 44: <factor> --> CONST_ENT\n");};
 
 comparador:
     OP_MAY          {printf("\nREGLA 45: <comparador> --> OP_MAY\n");} 
@@ -260,3 +290,18 @@ void cargarVecTablaString(char * text)
     
 }
 
+
+int crearTerceto(char *c1, char*c2 ,char *c3){//Acordarme de apsar [ ] cuando paso un indice
+    tercetosCreados++;
+    t_Terceto tercetos;
+   
+    tercetos.numTerceto = tercetosCreados;
+    strcpy(tercetos.posUno,c1);
+    strcpy(tercetos.posDos,c2);
+    strcpy(tercetos.posTres,c3);
+  
+
+    ponerEnCola(&colaTercetos,&tercetos,sizeof(tercetos));
+
+    return tercetosCreados;
+}

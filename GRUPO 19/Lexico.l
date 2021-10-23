@@ -44,6 +44,7 @@ char* validarRangoReal( char *text );
  // void cargarVecTablaString(char * text);
  int abrirTablaDeSimbolos();
 
+void escribirTercetosEnIntermedia();
 
 %}
 
@@ -192,11 +193,16 @@ int main(int argc,char *argv[])
   crearPila(&pTipoDato);
   crearPila(&pVariable);
 
-    abrirTablaDeSimbolos();
+    crearCola(&colaTercetos);
+
+    abrirTablaDeSimbolos();//si abre mal no derbai abrir el resto
+    abrirIntermedia();
     
 if ((yyin = fopen(argv[1], "rt")) == NULL)
     {
         printf("\nNo se puede abrir el archivo: %s\n", argv[1]);
+        fclose(fpTabla);
+        fclose(fpIntermedia);
     }
 else
     {
@@ -204,7 +210,9 @@ else
     }
     printf("\nTABLA DE SIMBOLOS:\n");
     escribirTablaSimbolos();
+    escribirTercetosEnIntermedia();
     fclose(fpTabla);
+    fclose(fpIntermedia);
     fclose(yyin);
     return 1;
 }
@@ -289,6 +297,28 @@ int abrirTablaDeSimbolos()
         return 0;
     }
     return 1;
+}
+
+//podriaSer la misma funcion q harab los archivos
+int abrirIntermedia(){
+    fpIntermedia = fopen(INTERMEDIA_TXT,"wt");
+    if(!fpIntermedia)
+    {
+        printf("Error de apertura del archivo de la tabla de simbolos");
+        return 0;
+    }
+    return 1;
+}
+
+void escribirTercetosEnIntermedia()
+{
+    while(!colaVacia(&colaTercetos)){
+      
+        t_Terceto t;
+        sacarDeCola(&colaTercetos,&t,100);
+        printf("DATPS: %s ", t.posUno); 
+        fprintf(fpIntermedia,"[%d] ( %s ; %s ; %s ) \n",t.numTerceto,t.posUno,t.posDos,t.posTres);
+    }
 }
 
 void escribirTablaSimbolos()
