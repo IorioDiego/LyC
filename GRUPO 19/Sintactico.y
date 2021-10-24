@@ -7,6 +7,7 @@
 #define LONG_TIPO_STR 10
 
 #define LONG_TERCETO 30 
+#define LONG_ID 30
 
 
 
@@ -52,11 +53,11 @@ int crearTerceto(char* c1,char *c2,char *c3 ,int nroT);
 int desapilarNroTerceto();
 void escribirTercetoActualEnAnterior(int tercetoAEscribir,int tercetoBuscado);
 int desapilarNroTerceto();
-
+int apilarNroTerceto(int nroTerceto);
 
 void escribirTablaSimbolos();//Sacar
 void cargarVecTablaString(char * text);
-void cargarVecTablaID(char * text);
+void cargarVecTablaID();
 void cargarVecTablaNumero(char * text);
 void cargarVecTablaString(char * text);
 int abrirTablaDeSimbolos();//Sacar
@@ -99,12 +100,12 @@ sentencia:
 
 
 declaracion:
-    DECVAR  dec ENDDECVAR            {cargarVecTablaID("hola");printf("\nREGLA 10: <declaracion> --> DECVAR DIM <dec> ENDDECVAR\n");};    
+    DECVAR  dec ENDDECVAR            {cargarVecTablaID();printf("\nREGLA 10: <declaracion> --> DECVAR DIM <dec> ENDDECVAR\n");};    
 
   
 listavar:
-    ID                             {ponerEnPila(&pVariable,yytext,30);printf("\nCANTIDDD DE REGISTROS >>>>>>>>>>>> %d\n", cantReg);printf("\nREGLA 11: <listavar> --> ID \n");}
-    | listavar COMA ID             {ponerEnPila(&pVariable,yytext,30);printf("\nCANTIDDD DE REGISTROS >>>>>>>>>>>> %d\n", cantReg);printf("\nREGLA 12: <listavar> --> <listavar> COMA ID\n");};
+    ID                             {crearTerceto(yytext,"_","_",tercetosCreados);ponerEnPila(&pVariable,yytext,LONG_ID);printf("\nCANTIDDD DE REGISTROS >>>>>>>>>>>> %d\n", cantReg);printf("\nREGLA 11: <listavar> --> ID \n");}
+    | listavar COMA ID             {crearTerceto(yytext,"_","_",tercetosCreados);ponerEnPila(&pVariable,yytext,LONG_ID);printf("\nCANTIDDD DE REGISTROS >>>>>>>>>>>> %d\n", cantReg);printf("\nREGLA 12: <listavar> --> <listavar> COMA ID\n");};
 
 listatipodato:
     tipodato                        {printf("\nREGLA 13: <listatipodato> --> <tipodato> \n");}
@@ -116,14 +117,17 @@ tipodato:
     | STRING                        {ponerEnPila(&pTipoDato,yytext,LONG_TIPO_STR);printf("\nREGLA 17: <tipodato> --> STRING \n");};
 
 seleccion:
-    IF condicion THEN  programa ELSE programa ENDIF      {
+    IF condicion  THEN  programa ELSE programa ENDIF      {
+                                                            int t = desapilarNroTerceto();
+                                                            escribirTercetoActualEnAnterior(tercetosCreados,t);
                                                         printf("\nREGLA 18: <seleccion> --> IF <condicion> THEN <programa> ELSE <programa> ENDIF\n");  
                                                         }
     | IF                               
-    condicion THEN {int a=0;}programa ENDIF    {
+    condicion  THEN programa ENDIF    {
                               
                                     int t = desapilarNroTerceto();
-                                    escribirTercetoActualEnAnterior(tercetosCreados+1,t);
+                                    escribirTercetoActualEnAnterior(tercetosCreados,t);
+                             
                                     printf("\nREGLA 19: <seleccion> --> IF <condicion> THEN <programa> ENDIF \n");
                                     };
 
@@ -136,10 +140,8 @@ ciclo:
     IN COR_A lista      {   int t;
                             cicloInd = crearTerceto("ETW","_","_",tercetosCreados);
                             apilarNroTerceto(cicloInd);
-                            crearTerceto("CMP", "NULL","PILA",tercetosCreados );
+                            crearTerceto("CMP", "@pilaEstaVacia","@topePilaLista",tercetosCreados );
                             apilarNroTerceto(crearTerceto("BNQ","_" ,"_",tercetosCreados));
-                            // char auxLista[4];
-                            // sprintf(auxLista,"[%d]",listaInd);
                              crearTerceto("OP_ASIG","@aux","@topePilaLista",tercetosCreados);
                         }   
                            
@@ -234,7 +236,9 @@ comparacion:
                                                             sacarDePila(&pilaExp,&exp2,sizeof(int));
                                                             sprintf(auxExp1,"[%d]",exp1 );
                                                             sprintf(auxExp2, "[%d]", exp2);
-                                                           comparacionInd = crearTerceto(comparador,auxExp1,auxExp2 ,tercetosCreados);
+                                                              crearTerceto("CMP",auxExp1,auxExp2,tercetosCreados);
+                                                           comparacionInd = crearTerceto(comparador,"_","_" ,tercetosCreados);
+                                                           apilarNroTerceto(comparacionInd);
                                                             printf("\nREGLA 29: <comparacion> --> <expresion><comparador><expresion> \n");
                                                         };
 
@@ -380,7 +384,7 @@ void cargarVecTablaNumero(char * text)
 
 
 
-void cargarVecTablaID(char * t)
+void cargarVecTablaID()
 {
     while(!pilaVacia(&pVariable))
     {

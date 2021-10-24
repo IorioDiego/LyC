@@ -43,6 +43,7 @@ char* validarRangoReal( char *text );
  // void cargarVecTablaNumero(char * text);
  // void cargarVecTablaString(char * text);
  int abrirTablaDeSimbolos();
+ int abrirIntermedia();
 
 void escribirTercetosEnIntermedia();
 
