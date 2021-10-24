@@ -197,6 +197,12 @@ int main(int argc,char *argv[])
     crearPila(&pilaLista);
     crearCola(&colaTercetos);
 
+
+    crearPila(&pilaExp);
+    crearPila(&pilaFact);
+    crearPila(&pilaTerm);
+
+
     abrirTablaDeSimbolos();//si abre mal no derbai abrir el resto
     abrirIntermedia();
     

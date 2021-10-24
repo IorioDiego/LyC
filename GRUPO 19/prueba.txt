@@ -1,8 +1,7 @@
 
 
-  WHILE var1 IN [ a , c , d]
-                DO
-                    var1 := var2 + 3
-              
-            ENDWHILE
-            
+/* TEST IF */
+IF var1 >= var2 
+THEN 
+    var1 := var2 + 3
+ENDIF

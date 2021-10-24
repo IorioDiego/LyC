@@ -104,6 +104,10 @@ tPila pVariable;
 tPila pilaNroTerceto;
 
 tPila pilaLista;
+tPila   pilaExp;
+tPila   pilaIDs;
+tPila   pilaFact;
+tPila   pilaTerm;
 
 
 //-Cola
