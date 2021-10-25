@@ -1,0 +1,17 @@
+NOMBRE                        			TIPO                          			VALOR                         			LONGITUD
+_var7                         			FLOAT                         			-                             			0
+_var5                         			FLOAT                         			-                             			0
+_var3                         			FLOAT                         			-                             			0
+_var2                         			FLOAT                         			-                             			0
+_var4                         			STRING                        			-                             			0
+_var1                         			INTEGER                       			-                             			0
+_3                            			-                             			3                             			0
+_-3                           			-                             			-3                            			0
+_.1                           			-                             			.1                            			0
+_2.3434343                    			-                             			2.3434343                     			0
+_9.0                          			-                             			9.0                           			0
+_13000                        			-                             			13000                         			0
+_2500                         			-                             			2500                          			0
+_250                          			-                             			250                           			0
+_HOLA_MUNDO                   			-                             			"HOLA MUNDO"                  			10
+_-32768                       			-                             			-32768                        			0

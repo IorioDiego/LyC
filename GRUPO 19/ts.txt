@@ -1,3 +1,0 @@
-NOMBRE                        			TIPO                          			VALOR                         			LONGITUD
-_3                            			-                             			3                             			0
-_1                            			-                             			1                             			0
