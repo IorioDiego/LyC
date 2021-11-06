@@ -108,6 +108,7 @@ tPila   pilaExp;
 tPila   pilaIDs;
 tPila   pilaFact;
 tPila   pilaTerm;
+tPila pilaComparacion;
 
 
 //-Cola

@@ -115,17 +115,17 @@ start: programa                     {       abrirTablaDeSimbolos("wt");
                                         
 
 programa:
-    sentencia                       {printf("\nREGLA 1: <programa> --> <sentencia>\n");}       
-    | programa sentencia            {sentInd=prgInd;printf("\nREGLA 2: <programa> --> <programa> <sentencia>\n");};              
+    sentencia                       {prgInd=sentInd;printf("\nREGLA 1: <programa> --> <sentencia>\n");}       
+    | programa sentencia            {prgInd=sentInd;printf("\nREGLA 2: <programa> --> <programa> <sentencia>\n");};              
     
 sentencia:
-     declaracion                     {printf("\nREGLA 3: <sentencia> --> <declaracion>\n");}  
-    |asignacion                      {printf("\nREGLA 4: <sentencia> --> <asignacion>\n");}   
-    |ciclo                           {printf("\nREGLA 5: <sentencia> --> <cilco>\n");}   
-    |seleccion                       {printf("\nREGLA 6: <sentencia> --> <seleccion>\n");}   
-    |salida                          {printf("\nREGLA 7: <sentencia> --> <salida>\n");}   
-    |entrada                         {printf("\nREGLA 8: <sentencia> --> <entrada>\n");} 
-    |longitud                        {printf("\nREGLA 9: <sentencia> --> <longitud>\n");}; 
+     declaracion                     {sentInd=decInd ;printf("\nREGLA 3: <sentencia> --> <declaracion>\n");}  
+    |asignacion                      {sentInd=asignacionInd;printf("\nREGLA 4: <sentencia> --> <asignacion>\n");}   
+    |ciclo                           {sentInd= cicloInd;printf("\nREGLA 5: <sentencia> --> <cilco>\n");}   
+    |seleccion                       {sentInd= selecInd;printf("\nREGLA 6: <sentencia> --> <seleccion>\n");}   
+    |salida                          {sentInd=salidaInd;printf("\nREGLA 7: <sentencia> --> <salida>\n");}   
+    |entrada                         {sentInd=entradaInd;printf("\nREGLA 8: <sentencia> --> <entrada>\n");} 
+    |longitud                        {sentInd=longInd;printf("\nREGLA 9: <sentencia> --> <longitud>\n");}; 
 
 
 declaracion:
@@ -133,8 +133,24 @@ declaracion:
 
   
 listavar:
-    ID                             {crearTerceto(yytext,"_","_",tercetosCreados);ponerEnPila(&pVariable,yytext,LONG_ID);printf("\nCANTIDDD DE REGISTROS >>>>>>>>>>>> %d\n", cantReg);printf("\nREGLA 11: <listavar> --> ID \n");}
-    | listavar COMA ID             {crearTerceto(yytext,"_","_",tercetosCreados);ponerEnPila(&pVariable,yytext,LONG_ID);printf("\nCANTIDDD DE REGISTROS >>>>>>>>>>>> %d\n", cantReg);printf("\nREGLA 12: <listavar> --> <listavar> COMA ID\n");};
+    ID                             {
+                                    char nv[200];
+                                    nv[0]='_';
+                                    nv[1]='\0';
+                                    strcat(nv,yytext); 
+                                    crearTerceto(nv,"_","_",tercetosCreados);
+                                    ponerEnPila(&pVariable,yytext,LONG_ID);
+                                    printf("\nREGLA 11: <listavar> --> ID \n");
+        
+                                    }
+    | listavar COMA ID             {
+                                    char nv[200];
+                                    nv[0]='_';
+                                    nv[1]='\0';
+                                    strcat(nv,yytext); 
+                                    crearTerceto(nv,"_","_",tercetosCreados);
+                                    ponerEnPila(&pVariable,yytext,LONG_ID);
+                                    printf("\nREGLA 12: <listavar> --> <listavar> COMA ID\n");};
 
 listatipodato:
     tipodato                        {printf("\nREGLA 13: <listatipodato> --> <tipodato> \n");}
@@ -146,23 +162,55 @@ tipodato:
     | STRING                        {ponerEnPila(&pTipoDato,yytext,LONG_TIPO_STR);printf("\nREGLA 17: <tipodato> --> STRING \n");};
 
 seleccion:
-    IF condicion  THEN  programa ELSE programa ENDIF      {
-                                                            int t = desapilarNroTerceto();
-                                                            escribirTercetoActualEnAnterior(tercetosCreados,t);
+    IF condicion  THEN  programa else programa ENDIF      {
+                                                            // int t = desapilarNroTerceto();
+                                                            int t;
+                                                           
+                                                          
+                                                            while(!pilaVacia(&pilaComparacion)){
+                                                                sacarDePila(&pilaComparacion,&t,sizeof(int));
+                                                                escribirTercetoActualEnAnterior(tercetosCreados,t);
+                                                            }
+                                                            
+                                                              selecInd = desapilarNroTerceto();
+                                                              escribirTercetoActualEnAnterior(tercetosCreados,selecInd);
+                                                             
                                                         printf("\nREGLA 18: <seleccion> --> IF <condicion> THEN <programa> ELSE <programa> ENDIF\n");  
                                                         }
     | IF                               
     condicion  THEN programa ENDIF    {
-                              
-                                    int t = desapilarNroTerceto();
-                                    escribirTercetoActualEnAnterior(tercetosCreados,t);
-                             
+                               
+                                    
+                                    int t; 
+                                     
+                                     while(!pilaVacia(&pilaComparacion)){
+                                         sacarDePila(&pilaComparacion,&t,sizeof(int));
+                                         escribirTercetoActualEnAnterior(tercetosCreados,t);
+                                     }
+                                     selecInd = desapilarNroTerceto();
                                     printf("\nREGLA 19: <seleccion> --> IF <condicion> THEN <programa> ENDIF \n");
                                     };
+else:
+    ELSE {   
+        //  int t= desapilarNroTerceto();
+        int t; 
+         sacarDePila(&pilaComparacion,&t,sizeof(int));
+        escribirTercetoActualEnAnterior(tercetosCreados+1,t);
+        apilarNroTerceto(sentInd);
+        apilarNroTerceto(crearTerceto("BI","_","_",tercetosCreados));};
+
+
+           
+
+
 
 ciclo:
     WHILE ID            {
-                            crearTerceto(yytext,"_","_",tercetosCreados);
+                                   char nv[200];
+                                    nv[0]='_';
+                                    nv[1]='\0';
+                                    strcat(nv,yytext); 
+                            crearTerceto(nv,"_","_",tercetosCreados);
                         }
                  
 
@@ -189,13 +237,38 @@ ciclo:
     ENDWHILE         {printf("\nREGLA 20: <ciclo> --> WHILE ID IN COR_A <lista> COR_C DO <sentencia> ENDWHILE\n");};
 
 entrada:
-    GET ID                                          {printf("\nREGLA 21: <entrada> --> GET <factor>\n");};
+    GET ID                                          {   
+
+                                                        char nv[200] ;
+                                                        nv[0] = '_';
+                                                        nv[1] = '\0';
+                                                        strcat(nv,yytext);
+                                                        entradaInd= crearTerceto("GET",nv,"_",tercetosCreados);
+                                                        printf("\nREGLA 21: <entrada> --> GET <factor>\n");};
 
 salida:
-    DISPLAY CONST_STR                                   {cargarVecTablaString(yytext);printf("\nREGLA 22: <salida> -->  DISPLAY CONST_STR  \n");};
+    DISPLAY CONST_STR                                   {   
+                                                                int i=0 ;
+                                                                char aux [strlen(yytext)+1];
+                                                                strcpy(aux,yytext);
+                                                                aux[0] = '_';
+                                                                for (i=0; i<= strlen(yytext) ; i++ )
+                                                                {
+                                                                    if(aux[i] == ' ')
+                                                                        aux[i]= '_';
+                                                                }
+                                                                aux[i-2]='\0';
+                                                            salidaInd=crearTerceto("DISPLAY",aux,"_",tercetosCreados);
+                                                            cargarVecTablaString(yytext);printf("\nREGLA 22: <salida> -->  DISPLAY CONST_STR  \n");};
 
 asignacion:
-    ID {asignacionInd = crearTerceto(yytext,"_","_",tercetosCreados);} 
+    ID                                                 {
+
+                                                        char nv[200] ;
+                                                        nv[0] = '_';
+                                                        nv[1] = '\0';
+                                                        strcat(nv,yytext);
+                                                        asignacionInd = crearTerceto(nv,"_","_",tercetosCreados);} 
     OP_ASIG expresion 
                                                         {
                                                            
@@ -219,7 +292,7 @@ condicion:
 
                                                             sprintf(condicionAux,"[%d]",condicionInd );
                                                             sprintf(comparacionAux, "[%d]", comparacionInd);
-
+                                                            
                                                         condicionInd = crearTerceto("AND", condicionAux , comparacionAux,tercetosCreados );
                                                         printf("\nREGLA 25: <condicion> --> <condicion> AND <comparacion>\n");
                                                         }
@@ -246,7 +319,7 @@ condicion:
     | PAR_A  NOT condicion PAR_C OR comparacion         {   
                                                             char condicionAux [LONG_TERCETO];
                                                             char comparacionAux [LONG_TERCETO];
-
+                                                            
                                                             sprintf(condicionAux,"[%d]",condicionInd );
                                                             sprintf(comparacionAux, "[%d]", comparacionInd);
                                                             condicionInd = crearTerceto("OR", condicionAux , comparacionAux,tercetosCreados );
@@ -265,9 +338,11 @@ comparacion:
                                                             sacarDePila(&pilaExp,&exp2,sizeof(int));
                                                             sprintf(auxExp1,"[%d]",exp1 );
                                                             sprintf(auxExp2, "[%d]", exp2);
-                                                              crearTerceto("CMP",auxExp1,auxExp2,tercetosCreados);
-                                                           comparacionInd = crearTerceto(comparador,"_","_" ,tercetosCreados);
+                                                            comparacionInd=crearTerceto("CMP",auxExp2,auxExp1,tercetosCreados);
                                                            apilarNroTerceto(comparacionInd);
+                                                           int t= crearTerceto(comparador,"_","_" ,tercetosCreados);
+                                                           ponerEnPila(&pilaComparacion,&t,sizeof(int));
+                                                          // apilarNroTerceto(t);
                                                             printf("\nREGLA 29: <comparacion> --> <expresion><comparador><expresion> \n");
                                                         };
 
@@ -363,16 +438,24 @@ factor:
 
 
     | ID                        {
-                                factInd = crearTerceto(yytext,"_","_",tercetosCreados);
+                                char nv[200];   
+                                nv[0] = '_';
+                                        
+                                nv[1] = '\0';
+                                strcat(nv,yytext);
+                                factInd = crearTerceto(nv,"_","_",tercetosCreados);
                                 ponerEnPila(&pilaFact,&factInd,sizeof(int));
                                 printf("\nREGLA 44: <factor> --> ID\n");
                                 } 
     | CONST_ENT                 {
                                 
                                 
-                                char nv[strlen(yytext)+3];
-                                strcpy( nv,yytext);
+                                char nv[strlen(yytext)+4];
+                                nv[0]='_';
+                                nv[1] = '\0';
+                                strcat( nv,yytext);
                                 strcat(nv,".0\0");
+                                
                                 factInd = crearTerceto(nv,"_","_", tercetosCreados);
                                 ponerEnPila(&pilaFact,&factInd,sizeof(int));
                                 cargarVecTablaNumero(nv);
@@ -388,8 +471,8 @@ comparador:
     | OP_DIF        {strcpy(comparador,"BNQ" );printf("\nREGLA 51: <comparador> --> OP_DIF\n");};
 
 dec:
-    dec DIM COR_A listavar COR_C AS COR_A listatipodato COR_C   {printf("\nREGLA 52: <dec> --> <dec> COR_A listavar COR_C AS COR_A listatipodato COR_C\n");} 
-    | DIM COR_A listavar COR_C AS COR_A listatipodato COR_C      {printf("\nREGLA 53: <dec> --> <dec> COR_A listavar COR_C AS COR_A listatipodato COR_C\n");};
+    dec DIM COR_A listavar COR_C AS COR_A listatipodato COR_C   {decInd =listavarInd  ;printf("\nREGLA 52: <dec> --> <dec> COR_A listavar COR_C AS COR_A listatipodato COR_C\n");} 
+    | DIM COR_A listavar COR_C AS COR_A listatipodato COR_C     {decInd =listavarInd  ;printf("\nREGLA 53: <dec> --> <dec> COR_A listavar COR_C AS COR_A listatipodato COR_C\n");};
 
 %%
 
@@ -409,20 +492,19 @@ void cargarVecTablaNumero(char * text)
 
     if(!duplicados){
         int tamanio=strlen(text),i;
-        char aux[tamanio+2];
-        aux[0]='_';
-        for (i=1; i<= tamanio ; i++ )
+        char aux[tamanio+1];
+     
+        for (i=0; i<= tamanio ; i++ )
         {
-            aux[i]=*(text+i-1);
+            aux[i]=*(text+i+1);
 
         }
        
         aux[i]='\0';
-        strcpy(tb[cantReg].nombre,aux);
-         strcpy( tb[cantReg].valor,text);
+        strcpy(tb[cantReg].nombre,text);
+         strcpy( tb[cantReg].valor,aux);
     //    strcat(tb[cantReg].valor,".0");
-        tb[cantReg].tipo[0] ='-';
-        tb[cantReg].tipo[1] ='\0'; 
+        strcpy(tb[cantReg].tipo,"INTEGER\0");
         tb[cantReg].longitud = 0;
      
 
@@ -461,8 +543,7 @@ void cargarVecTablaNumeroReal(char * text)
             strcpy(tb[cantReg].valor,aux);
         
         
-        tb[cantReg].tipo[0] ='-';
-        tb[cantReg].tipo[1] ='\0'; 
+        strcpy(tb[cantReg].tipo,"FLOAT\0");
         tb[cantReg].longitud = 0;
      
 
@@ -541,8 +622,8 @@ void cargarVecTablaString(char * text)
         if(!duplicados){
             strcpy(tb[cantReg].nombre,aux);
             strcpy(tb[cantReg].valor,text);
-            tb[cantReg].tipo[0] ='-';
-            tb[cantReg].tipo[1] ='\0';
+            
+            strcpy(tb[cantReg].tipo,"STRING\0");
             tb[cantReg].longitud = strlen(text)-2;
             (cantReg)++;
      

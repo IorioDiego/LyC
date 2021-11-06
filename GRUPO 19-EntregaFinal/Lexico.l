@@ -199,7 +199,7 @@ int main(int argc,char *argv[])
     crearPila(&pilaExp);
     crearPila(&pilaFact);
     crearPila(&pilaTerm);
-
+    crearPila(&pilaComparacion);
 
 
 

@@ -5,9 +5,13 @@ include number.asm
 .STACK 200h
 .DATA
 
-_var1                dd		 ?                              : numero en formato FLOAT
-_0.1                 dd		 0.1                            : numero en formato -
-_9.0                 dd		 9.0                            : numero en formato -
+_var7                dd		 ?                              : numero en formato FLOAT
+_var5                dd		 ?                              : numero en formato FLOAT
+_var3                dd		 ?                              : numero en formato FLOAT
+_var2                dd		 ?                              : numero en formato FLOAT
+_var4                dd		 ?                              : numero en formato STRING
+_var1                dd		 ?                              : numero en formato INTEGER
+_3.0                 dd		 3.0                            : numero en formato INTEGER
 
 .CODE
 mov AX.@DATA
