@@ -806,8 +806,8 @@ crearPila(&pWhile);
 int  ponerEnPila(tPila *p, const void *d, unsigned cantBytes);
 
 fprintf(fpAss,  "include macros2.asm");
-// fprintf(fpAss,  "\ninclude numbers.asm");
-fprintf(fpAss,  "\ninclude macros.asm");
+fprintf(fpAss,  "\ninclude number.asm");
+
 
 fprintf(fpAss,  "\n.MODEL LARGE");
 fprintf(fpAss,  "\n.386");
