@@ -1,8 +1,10 @@
 NOMBRE                        			TIPO                          			VALOR                         			LONGITUD
-_var7                         			FLOAT                         			-                             			0
-_var5                         			FLOAT                         			-                             			0
-_var3                         			FLOAT                         			-                             			0
+_d                            			FLOAT                         			-                             			0
+_c                            			FLOAT                         			-                             			0
+_a                            			FLOAT                         			-                             			0
+_var1                         			FLOAT                         			-                             			0
 _var2                         			FLOAT                         			-                             			0
-_var4                         			STRING                        			-                             			0
-_var1                         			INTEGER                       			-                             			0
-_3.0                          			INTEGER                       			3.0                           			0
+@cte0                         			INTEGER                       			3.0                           			0
+@real0                        			FLOAT                         			4.4                           			0
+@cte1                         			INTEGER                       			3.0                           			0
+_HOLA_MUNDOOOOO               			STRING                        			"HOLA MUNDOOOOO"              			14

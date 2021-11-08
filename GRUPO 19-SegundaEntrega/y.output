@@ -1,0 +1,1393 @@
+Gramática
+
+    0 $accept: programa $end
+
+    1 programa: sentencia
+    2         | programa sentencia
+
+    3 sentencia: declaracion
+    4          | asignacion
+    5          | ciclo
+    6          | seleccion
+    7          | salida
+    8          | entrada
+    9          | longitud
+
+   10 declaracion: DECVAR dec ENDDECVAR
+
+   11 listavar: ID
+   12         | listavar COMA ID
+
+   13 listatipodato: tipodato
+   14              | listatipodato COMA tipodato
+
+   15 tipodato: INTEGER
+   16         | FLOAT
+   17         | STRING
+
+   18 seleccion: IF condicion THEN programa ELSE programa ENDIF
+   19          | IF condicion THEN programa ENDIF
+
+   20 $@1: /* vacío */
+
+   21 $@2: /* vacío */
+
+   22 $@3: /* vacío */
+
+   23 ciclo: WHILE ID $@1 IN COR_A lista $@2 COR_C DO programa $@3 ENDWHILE
+
+   24 entrada: GET ID
+
+   25 salida: DISPLAY CONST_STR
+
+   26 $@4: /* vacío */
+
+   27 asignacion: ID $@4 OP_ASIG expresion
+
+   28 condicion: comparacion
+   29          | condicion AND comparacion
+   30          | condicion OR comparacion
+   31          | PAR_A NOT condicion PAR_C AND comparacion
+   32          | PAR_A NOT condicion PAR_C OR comparacion
+
+   33 comparacion: expresion comparador expresion
+
+   34 expresion: expresion OP_SUMA termino
+   35          | expresion OP_RESTA termino
+   36          | termino
+   37          | OP_RESTA expresion
+   38          | longitud
+
+   39 termino: termino OP_MULT factor
+   40        | termino OP_DIV factor
+   41        | factor
+
+   42 longitud: LONG PAR_A lista PAR_C
+
+   43 lista: factor
+   44      | lista COMA factor
+
+   45 factor: PAR_A expresion PAR_C
+   46       | CONST_REAL
+   47       | ID
+   48       | CONST_ENT
+
+   49 comparador: OP_MAY
+   50           | OP_MEN
+   51           | OP_MENIGU
+   52           | OP_MAYIGU
+   53           | OP_IGUAL
+   54           | OP_DIF
+
+   55 dec: dec DIM COR_A listavar COR_C AS COR_A listatipodato COR_C
+   56    | DIM COR_A listavar COR_C AS COR_A listatipodato COR_C
+
+
+Terminales con las reglas donde aparecen
+
+$end (0) 0
+error (256)
+OP_ASIG (258) 27
+OP_RESTA (259) 35 37
+OP_SUMA (260) 34
+OP_DIV (261) 40
+OP_MULT (262) 39
+MENOS_UNARIO (263)
+OP_MAY (264) 49
+OP_MAYIGU (265) 52
+OP_MEN (266) 50
+OP_MENIGU (267) 51
+OP_IGUAL (268) 53
+OP_DIF (269) 54
+WHILE (270) 23
+IF (271) 18 19
+INTEGER (272) 15
+FLOAT (273) 16
+STRING (274) 17
+ELSE (275) 18
+THEN (276) 18 19
+DECVAR (277) 10
+ENDDECVAR (278) 10
+AS (279) 55 56
+IN (280) 23
+AND (281) 29 31
+OR (282) 30 32
+NOT (283) 31 32
+LONG (284) 42
+DISPLAY (285) 25
+DIM (286) 55 56
+COMA (287) 12 14 44
+ENDIF (288) 18 19
+ENDWHILE (289) 23
+DO (290) 23
+GET (291) 24
+PAR_A (292) 31 32 42 45
+PAR_C (293) 31 32 42 45
+COR_A (294) 23 55 56
+COR_C (295) 23 55 56
+ID (296) 11 12 23 24 27 47
+CONST_ENT (297) 48
+CONST_REAL (298) 46
+CONST_STR (299) 25
+
+
+No terminales con las reglas donde aparecen
+
+$accept (45)
+    en la izquierda: 0
+programa (46)
+    en la izquierda: 1 2, en la derecha: 0 2 18 19 23
+sentencia (47)
+    en la izquierda: 3 4 5 6 7 8 9, en la derecha: 1 2
+declaracion (48)
+    en la izquierda: 10, en la derecha: 3
+listavar (49)
+    en la izquierda: 11 12, en la derecha: 12 55 56
+listatipodato (50)
+    en la izquierda: 13 14, en la derecha: 14 55 56
+tipodato (51)
+    en la izquierda: 15 16 17, en la derecha: 13 14
+seleccion (52)
+    en la izquierda: 18 19, en la derecha: 6
+ciclo (53)
+    en la izquierda: 23, en la derecha: 5
+$@1 (54)
+    en la izquierda: 20, en la derecha: 23
+$@2 (55)
+    en la izquierda: 21, en la derecha: 23
+$@3 (56)
+    en la izquierda: 22, en la derecha: 23
+entrada (57)
+    en la izquierda: 24, en la derecha: 8
+salida (58)
+    en la izquierda: 25, en la derecha: 7
+asignacion (59)
+    en la izquierda: 27, en la derecha: 4
+$@4 (60)
+    en la izquierda: 26, en la derecha: 27
+condicion (61)
+    en la izquierda: 28 29 30 31 32, en la derecha: 18 19 29 30 31
+    32
+comparacion (62)
+    en la izquierda: 33, en la derecha: 28 29 30 31 32
+expresion (63)
+    en la izquierda: 34 35 36 37 38, en la derecha: 27 33 34 35 37
+    45
+termino (64)
+    en la izquierda: 39 40 41, en la derecha: 34 35 36 39 40
+longitud (65)
+    en la izquierda: 42, en la derecha: 9 38
+lista (66)
+    en la izquierda: 43 44, en la derecha: 23 42 44
+factor (67)
+    en la izquierda: 45 46 47 48, en la derecha: 39 40 41 43 44
+comparador (68)
+    en la izquierda: 49 50 51 52 53 54, en la derecha: 33
+dec (69)
+    en la izquierda: 55 56, en la derecha: 10 55
+
+
+estado 0
+
+    0 $accept: . programa $end
+
+    WHILE    desplazar e ir al estado 1
+    IF       desplazar e ir al estado 2
+    DECVAR   desplazar e ir al estado 3
+    LONG     desplazar e ir al estado 4
+    DISPLAY  desplazar e ir al estado 5
+    GET      desplazar e ir al estado 6
+    ID       desplazar e ir al estado 7
+
+    programa     ir al estado 8
+    sentencia    ir al estado 9
+    declaracion  ir al estado 10
+    seleccion    ir al estado 11
+    ciclo        ir al estado 12
+    entrada      ir al estado 13
+    salida       ir al estado 14
+    asignacion   ir al estado 15
+    longitud     ir al estado 16
+
+
+estado 1
+
+   23 ciclo: WHILE . ID $@1 IN COR_A lista $@2 COR_C DO programa $@3 ENDWHILE
+
+    ID  desplazar e ir al estado 17
+
+
+estado 2
+
+   18 seleccion: IF . condicion THEN programa ELSE programa ENDIF
+   19          | IF . condicion THEN programa ENDIF
+
+    OP_RESTA    desplazar e ir al estado 18
+    LONG        desplazar e ir al estado 4
+    PAR_A       desplazar e ir al estado 19
+    ID          desplazar e ir al estado 20
+    CONST_ENT   desplazar e ir al estado 21
+    CONST_REAL  desplazar e ir al estado 22
+
+    condicion    ir al estado 23
+    comparacion  ir al estado 24
+    expresion    ir al estado 25
+    termino      ir al estado 26
+    longitud     ir al estado 27
+    factor       ir al estado 28
+
+
+estado 3
+
+   10 declaracion: DECVAR . dec ENDDECVAR
+
+    DIM  desplazar e ir al estado 29
+
+    dec  ir al estado 30
+
+
+estado 4
+
+   42 longitud: LONG . PAR_A lista PAR_C
+
+    PAR_A  desplazar e ir al estado 31
+
+
+estado 5
+
+   25 salida: DISPLAY . CONST_STR
+
+    CONST_STR  desplazar e ir al estado 32
+
+
+estado 6
+
+   24 entrada: GET . ID
+
+    ID  desplazar e ir al estado 33
+
+
+estado 7
+
+   27 asignacion: ID . $@4 OP_ASIG expresion
+
+    $default  reduce usando la regla 26 ($@4)
+
+    $@4  ir al estado 34
+
+
+estado 8
+
+    0 $accept: programa . $end
+    2 programa: programa . sentencia
+
+    $end     desplazar e ir al estado 35
+    WHILE    desplazar e ir al estado 1
+    IF       desplazar e ir al estado 2
+    DECVAR   desplazar e ir al estado 3
+    LONG     desplazar e ir al estado 4
+    DISPLAY  desplazar e ir al estado 5
+    GET      desplazar e ir al estado 6
+    ID       desplazar e ir al estado 7
+
+    sentencia    ir al estado 36
+    declaracion  ir al estado 10
+    seleccion    ir al estado 11
+    ciclo        ir al estado 12
+    entrada      ir al estado 13
+    salida       ir al estado 14
+    asignacion   ir al estado 15
+    longitud     ir al estado 16
+
+
+estado 9
+
+    1 programa: sentencia .
+
+    $default  reduce usando la regla 1 (programa)
+
+
+estado 10
+
+    3 sentencia: declaracion .
+
+    $default  reduce usando la regla 3 (sentencia)
+
+
+estado 11
+
+    6 sentencia: seleccion .
+
+    $default  reduce usando la regla 6 (sentencia)
+
+
+estado 12
+
+    5 sentencia: ciclo .
+
+    $default  reduce usando la regla 5 (sentencia)
+
+
+estado 13
+
+    8 sentencia: entrada .
+
+    $default  reduce usando la regla 8 (sentencia)
+
+
+estado 14
+
+    7 sentencia: salida .
+
+    $default  reduce usando la regla 7 (sentencia)
+
+
+estado 15
+
+    4 sentencia: asignacion .
+
+    $default  reduce usando la regla 4 (sentencia)
+
+
+estado 16
+
+    9 sentencia: longitud .
+
+    $default  reduce usando la regla 9 (sentencia)
+
+
+estado 17
+
+   23 ciclo: WHILE ID . $@1 IN COR_A lista $@2 COR_C DO programa $@3 ENDWHILE
+
+    $default  reduce usando la regla 20 ($@1)
+
+    $@1  ir al estado 37
+
+
+estado 18
+
+   37 expresion: OP_RESTA . expresion
+
+    OP_RESTA    desplazar e ir al estado 18
+    LONG        desplazar e ir al estado 4
+    PAR_A       desplazar e ir al estado 38
+    ID          desplazar e ir al estado 20
+    CONST_ENT   desplazar e ir al estado 21
+    CONST_REAL  desplazar e ir al estado 22
+
+    expresion  ir al estado 39
+    termino    ir al estado 26
+    longitud   ir al estado 27
+    factor     ir al estado 28
+
+
+estado 19
+
+   31 condicion: PAR_A . NOT condicion PAR_C AND comparacion
+   32          | PAR_A . NOT condicion PAR_C OR comparacion
+   45 factor: PAR_A . expresion PAR_C
+
+    OP_RESTA    desplazar e ir al estado 18
+    NOT         desplazar e ir al estado 40
+    LONG        desplazar e ir al estado 4
+    PAR_A       desplazar e ir al estado 38
+    ID          desplazar e ir al estado 20
+    CONST_ENT   desplazar e ir al estado 21
+    CONST_REAL  desplazar e ir al estado 22
+
+    expresion  ir al estado 41
+    termino    ir al estado 26
+    longitud   ir al estado 27
+    factor     ir al estado 28
+
+
+estado 20
+
+   47 factor: ID .
+
+    $default  reduce usando la regla 47 (factor)
+
+
+estado 21
+
+   48 factor: CONST_ENT .
+
+    $default  reduce usando la regla 48 (factor)
+
+
+estado 22
+
+   46 factor: CONST_REAL .
+
+    $default  reduce usando la regla 46 (factor)
+
+
+estado 23
+
+   18 seleccion: IF condicion . THEN programa ELSE programa ENDIF
+   19          | IF condicion . THEN programa ENDIF
+   29 condicion: condicion . AND comparacion
+   30          | condicion . OR comparacion
+
+    THEN  desplazar e ir al estado 42
+    AND   desplazar e ir al estado 43
+    OR    desplazar e ir al estado 44
+
+
+estado 24
+
+   28 condicion: comparacion .
+
+    $default  reduce usando la regla 28 (condicion)
+
+
+estado 25
+
+   33 comparacion: expresion . comparador expresion
+   34 expresion: expresion . OP_SUMA termino
+   35          | expresion . OP_RESTA termino
+
+    OP_RESTA   desplazar e ir al estado 45
+    OP_SUMA    desplazar e ir al estado 46
+    OP_MAY     desplazar e ir al estado 47
+    OP_MAYIGU  desplazar e ir al estado 48
+    OP_MEN     desplazar e ir al estado 49
+    OP_MENIGU  desplazar e ir al estado 50
+    OP_IGUAL   desplazar e ir al estado 51
+    OP_DIF     desplazar e ir al estado 52
+
+    comparador  ir al estado 53
+
+
+estado 26
+
+   36 expresion: termino .
+   39 termino: termino . OP_MULT factor
+   40        | termino . OP_DIV factor
+
+    OP_DIV   desplazar e ir al estado 54
+    OP_MULT  desplazar e ir al estado 55
+
+    $default  reduce usando la regla 36 (expresion)
+
+
+estado 27
+
+   38 expresion: longitud .
+
+    $default  reduce usando la regla 38 (expresion)
+
+
+estado 28
+
+   41 termino: factor .
+
+    $default  reduce usando la regla 41 (termino)
+
+
+estado 29
+
+   56 dec: DIM . COR_A listavar COR_C AS COR_A listatipodato COR_C
+
+    COR_A  desplazar e ir al estado 56
+
+
+estado 30
+
+   10 declaracion: DECVAR dec . ENDDECVAR
+   55 dec: dec . DIM COR_A listavar COR_C AS COR_A listatipodato COR_C
+
+    ENDDECVAR  desplazar e ir al estado 57
+    DIM        desplazar e ir al estado 58
+
+
+estado 31
+
+   42 longitud: LONG PAR_A . lista PAR_C
+
+    PAR_A       desplazar e ir al estado 38
+    ID          desplazar e ir al estado 20
+    CONST_ENT   desplazar e ir al estado 21
+    CONST_REAL  desplazar e ir al estado 22
+
+    lista   ir al estado 59
+    factor  ir al estado 60
+
+
+estado 32
+
+   25 salida: DISPLAY CONST_STR .
+
+    $default  reduce usando la regla 25 (salida)
+
+
+estado 33
+
+   24 entrada: GET ID .
+
+    $default  reduce usando la regla 24 (entrada)
+
+
+estado 34
+
+   27 asignacion: ID $@4 . OP_ASIG expresion
+
+    OP_ASIG  desplazar e ir al estado 61
+
+
+estado 35
+
+    0 $accept: programa $end .
+
+    $default  aceptar
+
+
+estado 36
+
+    2 programa: programa sentencia .
+
+    $default  reduce usando la regla 2 (programa)
+
+
+estado 37
+
+   23 ciclo: WHILE ID $@1 . IN COR_A lista $@2 COR_C DO programa $@3 ENDWHILE
+
+    IN  desplazar e ir al estado 62
+
+
+estado 38
+
+   45 factor: PAR_A . expresion PAR_C
+
+    OP_RESTA    desplazar e ir al estado 18
+    LONG        desplazar e ir al estado 4
+    PAR_A       desplazar e ir al estado 38
+    ID          desplazar e ir al estado 20
+    CONST_ENT   desplazar e ir al estado 21
+    CONST_REAL  desplazar e ir al estado 22
+
+    expresion  ir al estado 41
+    termino    ir al estado 26
+    longitud   ir al estado 27
+    factor     ir al estado 28
+
+
+estado 39
+
+   34 expresion: expresion . OP_SUMA termino
+   35          | expresion . OP_RESTA termino
+   37          | OP_RESTA expresion .
+
+    $default  reduce usando la regla 37 (expresion)
+
+
+estado 40
+
+   31 condicion: PAR_A NOT . condicion PAR_C AND comparacion
+   32          | PAR_A NOT . condicion PAR_C OR comparacion
+
+    OP_RESTA    desplazar e ir al estado 18
+    LONG        desplazar e ir al estado 4
+    PAR_A       desplazar e ir al estado 19
+    ID          desplazar e ir al estado 20
+    CONST_ENT   desplazar e ir al estado 21
+    CONST_REAL  desplazar e ir al estado 22
+
+    condicion    ir al estado 63
+    comparacion  ir al estado 24
+    expresion    ir al estado 25
+    termino      ir al estado 26
+    longitud     ir al estado 27
+    factor       ir al estado 28
+
+
+estado 41
+
+   34 expresion: expresion . OP_SUMA termino
+   35          | expresion . OP_RESTA termino
+   45 factor: PAR_A expresion . PAR_C
+
+    OP_RESTA  desplazar e ir al estado 45
+    OP_SUMA   desplazar e ir al estado 46
+    PAR_C     desplazar e ir al estado 64
+
+
+estado 42
+
+   18 seleccion: IF condicion THEN . programa ELSE programa ENDIF
+   19          | IF condicion THEN . programa ENDIF
+
+    WHILE    desplazar e ir al estado 1
+    IF       desplazar e ir al estado 2
+    DECVAR   desplazar e ir al estado 3
+    LONG     desplazar e ir al estado 4
+    DISPLAY  desplazar e ir al estado 5
+    GET      desplazar e ir al estado 6
+    ID       desplazar e ir al estado 7
+
+    programa     ir al estado 65
+    sentencia    ir al estado 9
+    declaracion  ir al estado 10
+    seleccion    ir al estado 11
+    ciclo        ir al estado 12
+    entrada      ir al estado 13
+    salida       ir al estado 14
+    asignacion   ir al estado 15
+    longitud     ir al estado 16
+
+
+estado 43
+
+   29 condicion: condicion AND . comparacion
+
+    OP_RESTA    desplazar e ir al estado 18
+    LONG        desplazar e ir al estado 4
+    PAR_A       desplazar e ir al estado 38
+    ID          desplazar e ir al estado 20
+    CONST_ENT   desplazar e ir al estado 21
+    CONST_REAL  desplazar e ir al estado 22
+
+    comparacion  ir al estado 66
+    expresion    ir al estado 25
+    termino      ir al estado 26
+    longitud     ir al estado 27
+    factor       ir al estado 28
+
+
+estado 44
+
+   30 condicion: condicion OR . comparacion
+
+    OP_RESTA    desplazar e ir al estado 18
+    LONG        desplazar e ir al estado 4
+    PAR_A       desplazar e ir al estado 38
+    ID          desplazar e ir al estado 20
+    CONST_ENT   desplazar e ir al estado 21
+    CONST_REAL  desplazar e ir al estado 22
+
+    comparacion  ir al estado 67
+    expresion    ir al estado 25
+    termino      ir al estado 26
+    longitud     ir al estado 27
+    factor       ir al estado 28
+
+
+estado 45
+
+   35 expresion: expresion OP_RESTA . termino
+
+    PAR_A       desplazar e ir al estado 38
+    ID          desplazar e ir al estado 20
+    CONST_ENT   desplazar e ir al estado 21
+    CONST_REAL  desplazar e ir al estado 22
+
+    termino  ir al estado 68
+    factor   ir al estado 28
+
+
+estado 46
+
+   34 expresion: expresion OP_SUMA . termino
+
+    PAR_A       desplazar e ir al estado 38
+    ID          desplazar e ir al estado 20
+    CONST_ENT   desplazar e ir al estado 21
+    CONST_REAL  desplazar e ir al estado 22
+
+    termino  ir al estado 69
+    factor   ir al estado 28
+
+
+estado 47
+
+   49 comparador: OP_MAY .
+
+    $default  reduce usando la regla 49 (comparador)
+
+
+estado 48
+
+   52 comparador: OP_MAYIGU .
+
+    $default  reduce usando la regla 52 (comparador)
+
+
+estado 49
+
+   50 comparador: OP_MEN .
+
+    $default  reduce usando la regla 50 (comparador)
+
+
+estado 50
+
+   51 comparador: OP_MENIGU .
+
+    $default  reduce usando la regla 51 (comparador)
+
+
+estado 51
+
+   53 comparador: OP_IGUAL .
+
+    $default  reduce usando la regla 53 (comparador)
+
+
+estado 52
+
+   54 comparador: OP_DIF .
+
+    $default  reduce usando la regla 54 (comparador)
+
+
+estado 53
+
+   33 comparacion: expresion comparador . expresion
+
+    OP_RESTA    desplazar e ir al estado 18
+    LONG        desplazar e ir al estado 4
+    PAR_A       desplazar e ir al estado 38
+    ID          desplazar e ir al estado 20
+    CONST_ENT   desplazar e ir al estado 21
+    CONST_REAL  desplazar e ir al estado 22
+
+    expresion  ir al estado 70
+    termino    ir al estado 26
+    longitud   ir al estado 27
+    factor     ir al estado 28
+
+
+estado 54
+
+   40 termino: termino OP_DIV . factor
+
+    PAR_A       desplazar e ir al estado 38
+    ID          desplazar e ir al estado 20
+    CONST_ENT   desplazar e ir al estado 21
+    CONST_REAL  desplazar e ir al estado 22
+
+    factor  ir al estado 71
+
+
+estado 55
+
+   39 termino: termino OP_MULT . factor
+
+    PAR_A       desplazar e ir al estado 38
+    ID          desplazar e ir al estado 20
+    CONST_ENT   desplazar e ir al estado 21
+    CONST_REAL  desplazar e ir al estado 22
+
+    factor  ir al estado 72
+
+
+estado 56
+
+   56 dec: DIM COR_A . listavar COR_C AS COR_A listatipodato COR_C
+
+    ID  desplazar e ir al estado 73
+
+    listavar  ir al estado 74
+
+
+estado 57
+
+   10 declaracion: DECVAR dec ENDDECVAR .
+
+    $default  reduce usando la regla 10 (declaracion)
+
+
+estado 58
+
+   55 dec: dec DIM . COR_A listavar COR_C AS COR_A listatipodato COR_C
+
+    COR_A  desplazar e ir al estado 75
+
+
+estado 59
+
+   42 longitud: LONG PAR_A lista . PAR_C
+   44 lista: lista . COMA factor
+
+    COMA   desplazar e ir al estado 76
+    PAR_C  desplazar e ir al estado 77
+
+
+estado 60
+
+   43 lista: factor .
+
+    $default  reduce usando la regla 43 (lista)
+
+
+estado 61
+
+   27 asignacion: ID $@4 OP_ASIG . expresion
+
+    OP_RESTA    desplazar e ir al estado 18
+    LONG        desplazar e ir al estado 4
+    PAR_A       desplazar e ir al estado 38
+    ID          desplazar e ir al estado 20
+    CONST_ENT   desplazar e ir al estado 21
+    CONST_REAL  desplazar e ir al estado 22
+
+    expresion  ir al estado 78
+    termino    ir al estado 26
+    longitud   ir al estado 27
+    factor     ir al estado 28
+
+
+estado 62
+
+   23 ciclo: WHILE ID $@1 IN . COR_A lista $@2 COR_C DO programa $@3 ENDWHILE
+
+    COR_A  desplazar e ir al estado 79
+
+
+estado 63
+
+   29 condicion: condicion . AND comparacion
+   30          | condicion . OR comparacion
+   31          | PAR_A NOT condicion . PAR_C AND comparacion
+   32          | PAR_A NOT condicion . PAR_C OR comparacion
+
+    AND    desplazar e ir al estado 43
+    OR     desplazar e ir al estado 44
+    PAR_C  desplazar e ir al estado 80
+
+
+estado 64
+
+   45 factor: PAR_A expresion PAR_C .
+
+    $default  reduce usando la regla 45 (factor)
+
+
+estado 65
+
+    2 programa: programa . sentencia
+   18 seleccion: IF condicion THEN programa . ELSE programa ENDIF
+   19          | IF condicion THEN programa . ENDIF
+
+    WHILE    desplazar e ir al estado 1
+    IF       desplazar e ir al estado 2
+    ELSE     desplazar e ir al estado 81
+    DECVAR   desplazar e ir al estado 3
+    LONG     desplazar e ir al estado 4
+    DISPLAY  desplazar e ir al estado 5
+    ENDIF    desplazar e ir al estado 82
+    GET      desplazar e ir al estado 6
+    ID       desplazar e ir al estado 7
+
+    sentencia    ir al estado 36
+    declaracion  ir al estado 10
+    seleccion    ir al estado 11
+    ciclo        ir al estado 12
+    entrada      ir al estado 13
+    salida       ir al estado 14
+    asignacion   ir al estado 15
+    longitud     ir al estado 16
+
+
+estado 66
+
+   29 condicion: condicion AND comparacion .
+
+    $default  reduce usando la regla 29 (condicion)
+
+
+estado 67
+
+   30 condicion: condicion OR comparacion .
+
+    $default  reduce usando la regla 30 (condicion)
+
+
+estado 68
+
+   35 expresion: expresion OP_RESTA termino .
+   39 termino: termino . OP_MULT factor
+   40        | termino . OP_DIV factor
+
+    OP_DIV   desplazar e ir al estado 54
+    OP_MULT  desplazar e ir al estado 55
+
+    $default  reduce usando la regla 35 (expresion)
+
+
+estado 69
+
+   34 expresion: expresion OP_SUMA termino .
+   39 termino: termino . OP_MULT factor
+   40        | termino . OP_DIV factor
+
+    OP_DIV   desplazar e ir al estado 54
+    OP_MULT  desplazar e ir al estado 55
+
+    $default  reduce usando la regla 34 (expresion)
+
+
+estado 70
+
+   33 comparacion: expresion comparador expresion .
+   34 expresion: expresion . OP_SUMA termino
+   35          | expresion . OP_RESTA termino
+
+    OP_RESTA  desplazar e ir al estado 45
+    OP_SUMA   desplazar e ir al estado 46
+
+    $default  reduce usando la regla 33 (comparacion)
+
+
+estado 71
+
+   40 termino: termino OP_DIV factor .
+
+    $default  reduce usando la regla 40 (termino)
+
+
+estado 72
+
+   39 termino: termino OP_MULT factor .
+
+    $default  reduce usando la regla 39 (termino)
+
+
+estado 73
+
+   11 listavar: ID .
+
+    $default  reduce usando la regla 11 (listavar)
+
+
+estado 74
+
+   12 listavar: listavar . COMA ID
+   56 dec: DIM COR_A listavar . COR_C AS COR_A listatipodato COR_C
+
+    COMA   desplazar e ir al estado 83
+    COR_C  desplazar e ir al estado 84
+
+
+estado 75
+
+   55 dec: dec DIM COR_A . listavar COR_C AS COR_A listatipodato COR_C
+
+    ID  desplazar e ir al estado 73
+
+    listavar  ir al estado 85
+
+
+estado 76
+
+   44 lista: lista COMA . factor
+
+    PAR_A       desplazar e ir al estado 38
+    ID          desplazar e ir al estado 20
+    CONST_ENT   desplazar e ir al estado 21
+    CONST_REAL  desplazar e ir al estado 22
+
+    factor  ir al estado 86
+
+
+estado 77
+
+   42 longitud: LONG PAR_A lista PAR_C .
+
+    $default  reduce usando la regla 42 (longitud)
+
+
+estado 78
+
+   27 asignacion: ID $@4 OP_ASIG expresion .
+   34 expresion: expresion . OP_SUMA termino
+   35          | expresion . OP_RESTA termino
+
+    OP_RESTA  desplazar e ir al estado 45
+    OP_SUMA   desplazar e ir al estado 46
+
+    $default  reduce usando la regla 27 (asignacion)
+
+
+estado 79
+
+   23 ciclo: WHILE ID $@1 IN COR_A . lista $@2 COR_C DO programa $@3 ENDWHILE
+
+    PAR_A       desplazar e ir al estado 38
+    ID          desplazar e ir al estado 20
+    CONST_ENT   desplazar e ir al estado 21
+    CONST_REAL  desplazar e ir al estado 22
+
+    lista   ir al estado 87
+    factor  ir al estado 60
+
+
+estado 80
+
+   31 condicion: PAR_A NOT condicion PAR_C . AND comparacion
+   32          | PAR_A NOT condicion PAR_C . OR comparacion
+
+    AND  desplazar e ir al estado 88
+    OR   desplazar e ir al estado 89
+
+
+estado 81
+
+   18 seleccion: IF condicion THEN programa ELSE . programa ENDIF
+
+    WHILE    desplazar e ir al estado 1
+    IF       desplazar e ir al estado 2
+    DECVAR   desplazar e ir al estado 3
+    LONG     desplazar e ir al estado 4
+    DISPLAY  desplazar e ir al estado 5
+    GET      desplazar e ir al estado 6
+    ID       desplazar e ir al estado 7
+
+    programa     ir al estado 90
+    sentencia    ir al estado 9
+    declaracion  ir al estado 10
+    seleccion    ir al estado 11
+    ciclo        ir al estado 12
+    entrada      ir al estado 13
+    salida       ir al estado 14
+    asignacion   ir al estado 15
+    longitud     ir al estado 16
+
+
+estado 82
+
+   19 seleccion: IF condicion THEN programa ENDIF .
+
+    $default  reduce usando la regla 19 (seleccion)
+
+
+estado 83
+
+   12 listavar: listavar COMA . ID
+
+    ID  desplazar e ir al estado 91
+
+
+estado 84
+
+   56 dec: DIM COR_A listavar COR_C . AS COR_A listatipodato COR_C
+
+    AS  desplazar e ir al estado 92
+
+
+estado 85
+
+   12 listavar: listavar . COMA ID
+   55 dec: dec DIM COR_A listavar . COR_C AS COR_A listatipodato COR_C
+
+    COMA   desplazar e ir al estado 83
+    COR_C  desplazar e ir al estado 93
+
+
+estado 86
+
+   44 lista: lista COMA factor .
+
+    $default  reduce usando la regla 44 (lista)
+
+
+estado 87
+
+   23 ciclo: WHILE ID $@1 IN COR_A lista . $@2 COR_C DO programa $@3 ENDWHILE
+   44 lista: lista . COMA factor
+
+    COMA  desplazar e ir al estado 76
+
+    $default  reduce usando la regla 21 ($@2)
+
+    $@2  ir al estado 94
+
+
+estado 88
+
+   31 condicion: PAR_A NOT condicion PAR_C AND . comparacion
+
+    OP_RESTA    desplazar e ir al estado 18
+    LONG        desplazar e ir al estado 4
+    PAR_A       desplazar e ir al estado 38
+    ID          desplazar e ir al estado 20
+    CONST_ENT   desplazar e ir al estado 21
+    CONST_REAL  desplazar e ir al estado 22
+
+    comparacion  ir al estado 95
+    expresion    ir al estado 25
+    termino      ir al estado 26
+    longitud     ir al estado 27
+    factor       ir al estado 28
+
+
+estado 89
+
+   32 condicion: PAR_A NOT condicion PAR_C OR . comparacion
+
+    OP_RESTA    desplazar e ir al estado 18
+    LONG        desplazar e ir al estado 4
+    PAR_A       desplazar e ir al estado 38
+    ID          desplazar e ir al estado 20
+    CONST_ENT   desplazar e ir al estado 21
+    CONST_REAL  desplazar e ir al estado 22
+
+    comparacion  ir al estado 96
+    expresion    ir al estado 25
+    termino      ir al estado 26
+    longitud     ir al estado 27
+    factor       ir al estado 28
+
+
+estado 90
+
+    2 programa: programa . sentencia
+   18 seleccion: IF condicion THEN programa ELSE programa . ENDIF
+
+    WHILE    desplazar e ir al estado 1
+    IF       desplazar e ir al estado 2
+    DECVAR   desplazar e ir al estado 3
+    LONG     desplazar e ir al estado 4
+    DISPLAY  desplazar e ir al estado 5
+    ENDIF    desplazar e ir al estado 97
+    GET      desplazar e ir al estado 6
+    ID       desplazar e ir al estado 7
+
+    sentencia    ir al estado 36
+    declaracion  ir al estado 10
+    seleccion    ir al estado 11
+    ciclo        ir al estado 12
+    entrada      ir al estado 13
+    salida       ir al estado 14
+    asignacion   ir al estado 15
+    longitud     ir al estado 16
+
+
+estado 91
+
+   12 listavar: listavar COMA ID .
+
+    $default  reduce usando la regla 12 (listavar)
+
+
+estado 92
+
+   56 dec: DIM COR_A listavar COR_C AS . COR_A listatipodato COR_C
+
+    COR_A  desplazar e ir al estado 98
+
+
+estado 93
+
+   55 dec: dec DIM COR_A listavar COR_C . AS COR_A listatipodato COR_C
+
+    AS  desplazar e ir al estado 99
+
+
+estado 94
+
+   23 ciclo: WHILE ID $@1 IN COR_A lista $@2 . COR_C DO programa $@3 ENDWHILE
+
+    COR_C  desplazar e ir al estado 100
+
+
+estado 95
+
+   31 condicion: PAR_A NOT condicion PAR_C AND comparacion .
+
+    $default  reduce usando la regla 31 (condicion)
+
+
+estado 96
+
+   32 condicion: PAR_A NOT condicion PAR_C OR comparacion .
+
+    $default  reduce usando la regla 32 (condicion)
+
+
+estado 97
+
+   18 seleccion: IF condicion THEN programa ELSE programa ENDIF .
+
+    $default  reduce usando la regla 18 (seleccion)
+
+
+estado 98
+
+   56 dec: DIM COR_A listavar COR_C AS COR_A . listatipodato COR_C
+
+    INTEGER  desplazar e ir al estado 101
+    FLOAT    desplazar e ir al estado 102
+    STRING   desplazar e ir al estado 103
+
+    listatipodato  ir al estado 104
+    tipodato       ir al estado 105
+
+
+estado 99
+
+   55 dec: dec DIM COR_A listavar COR_C AS . COR_A listatipodato COR_C
+
+    COR_A  desplazar e ir al estado 106
+
+
+estado 100
+
+   23 ciclo: WHILE ID $@1 IN COR_A lista $@2 COR_C . DO programa $@3 ENDWHILE
+
+    DO  desplazar e ir al estado 107
+
+
+estado 101
+
+   15 tipodato: INTEGER .
+
+    $default  reduce usando la regla 15 (tipodato)
+
+
+estado 102
+
+   16 tipodato: FLOAT .
+
+    $default  reduce usando la regla 16 (tipodato)
+
+
+estado 103
+
+   17 tipodato: STRING .
+
+    $default  reduce usando la regla 17 (tipodato)
+
+
+estado 104
+
+   14 listatipodato: listatipodato . COMA tipodato
+   56 dec: DIM COR_A listavar COR_C AS COR_A listatipodato . COR_C
+
+    COMA   desplazar e ir al estado 108
+    COR_C  desplazar e ir al estado 109
+
+
+estado 105
+
+   13 listatipodato: tipodato .
+
+    $default  reduce usando la regla 13 (listatipodato)
+
+
+estado 106
+
+   55 dec: dec DIM COR_A listavar COR_C AS COR_A . listatipodato COR_C
+
+    INTEGER  desplazar e ir al estado 101
+    FLOAT    desplazar e ir al estado 102
+    STRING   desplazar e ir al estado 103
+
+    listatipodato  ir al estado 110
+    tipodato       ir al estado 105
+
+
+estado 107
+
+   23 ciclo: WHILE ID $@1 IN COR_A lista $@2 COR_C DO . programa $@3 ENDWHILE
+
+    WHILE    desplazar e ir al estado 1
+    IF       desplazar e ir al estado 2
+    DECVAR   desplazar e ir al estado 3
+    LONG     desplazar e ir al estado 4
+    DISPLAY  desplazar e ir al estado 5
+    GET      desplazar e ir al estado 6
+    ID       desplazar e ir al estado 7
+
+    programa     ir al estado 111
+    sentencia    ir al estado 9
+    declaracion  ir al estado 10
+    seleccion    ir al estado 11
+    ciclo        ir al estado 12
+    entrada      ir al estado 13
+    salida       ir al estado 14
+    asignacion   ir al estado 15
+    longitud     ir al estado 16
+
+
+estado 108
+
+   14 listatipodato: listatipodato COMA . tipodato
+
+    INTEGER  desplazar e ir al estado 101
+    FLOAT    desplazar e ir al estado 102
+    STRING   desplazar e ir al estado 103
+
+    tipodato  ir al estado 112
+
+
+estado 109
+
+   56 dec: DIM COR_A listavar COR_C AS COR_A listatipodato COR_C .
+
+    $default  reduce usando la regla 56 (dec)
+
+
+estado 110
+
+   14 listatipodato: listatipodato . COMA tipodato
+   55 dec: dec DIM COR_A listavar COR_C AS COR_A listatipodato . COR_C
+
+    COMA   desplazar e ir al estado 108
+    COR_C  desplazar e ir al estado 113
+
+
+estado 111
+
+    2 programa: programa . sentencia
+   23 ciclo: WHILE ID $@1 IN COR_A lista $@2 COR_C DO programa . $@3 ENDWHILE
+
+    WHILE    desplazar e ir al estado 1
+    IF       desplazar e ir al estado 2
+    DECVAR   desplazar e ir al estado 3
+    LONG     desplazar e ir al estado 4
+    DISPLAY  desplazar e ir al estado 5
+    GET      desplazar e ir al estado 6
+    ID       desplazar e ir al estado 7
+
+    $default  reduce usando la regla 22 ($@3)
+
+    sentencia    ir al estado 36
+    declaracion  ir al estado 10
+    seleccion    ir al estado 11
+    ciclo        ir al estado 12
+    $@3          ir al estado 114
+    entrada      ir al estado 13
+    salida       ir al estado 14
+    asignacion   ir al estado 15
+    longitud     ir al estado 16
+
+
+estado 112
+
+   14 listatipodato: listatipodato COMA tipodato .
+
+    $default  reduce usando la regla 14 (listatipodato)
+
+
+estado 113
+
+   55 dec: dec DIM COR_A listavar COR_C AS COR_A listatipodato COR_C .
+
+    $default  reduce usando la regla 55 (dec)
+
+
+estado 114
+
+   23 ciclo: WHILE ID $@1 IN COR_A lista $@2 COR_C DO programa $@3 . ENDWHILE
+
+    ENDWHILE  desplazar e ir al estado 115
+
+
+estado 115
+
+   23 ciclo: WHILE ID $@1 IN COR_A lista $@2 COR_C DO programa $@3 ENDWHILE .
+
+    $default  reduce usando la regla 23 (ciclo)

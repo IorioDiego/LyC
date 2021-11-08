@@ -19,6 +19,7 @@ int yyparse();
 int yylex();
 int yyparse();
 int yyerror();
+int contWhile=0;
 char * yytext;
 
 
@@ -49,20 +50,25 @@ int     sentInd=0,
 int contList;
 int tercetosCreados=1;
 char comparador[4];
+char idWhile[200];
+int fueOr=0;
+int contComparacion = 0;
+int conEnt=0;
+int contReal = 0;
 
 void generarAssembler();
 
 int crearTerceto(char* c1,char *c2,char *c3 ,int nroT);
 int desapilarNroTerceto();
-void escribirTercetoActualEnAnterior(int tercetoAEscribir,int tercetoBuscado);
+void escribirTercetoActualEnAnterior(int tercetoAEscribir,int tercetoBuscado,char * etiqueta);
 int desapilarNroTerceto();
 int apilarNroTerceto(int nroTerceto);
 
 
-void cargarVecTablaNumeroReal(char * text);
+void cargarVecTablaNumeroReal(char * text,char * valorReal);
 void cargarVecTablaString(char * text);
 void cargarVecTablaID();
-void cargarVecTablaNumero(char * text);
+void cargarVecTablaNumero(char * text,char* valorReal);
 void cargarVecTablaString(char * text);
 
 
@@ -162,42 +168,92 @@ tipodato:
     | STRING                        {ponerEnPila(&pTipoDato,yytext,LONG_TIPO_STR);printf("\nREGLA 17: <tipodato> --> STRING \n");};
 
 seleccion:
-    IF condicion  THEN  programa else programa ENDIF      {
+    IF condicion  then  programa else programa ENDIF      {
                                                             // int t = desapilarNroTerceto();
                                                             int t;
                                                            
                                                           
                                                             while(!pilaVacia(&pilaComparacion)){
                                                                 sacarDePila(&pilaComparacion,&t,sizeof(int));
-                                                                escribirTercetoActualEnAnterior(tercetosCreados,t);
+                                                                escribirTercetoActualEnAnterior(tercetosCreados,t,"etiqELSE");
                                                             }
                                                             
                                                               selecInd = desapilarNroTerceto();
-                                                              escribirTercetoActualEnAnterior(tercetosCreados,selecInd);
-                                                             
+                                                              escribirTercetoActualEnAnterior(tercetosCreados,selecInd,"etiqIF");
+                                                            char etiqueta[20];
+                                                            sprintf(etiqueta,"etiqIF%d\0",tercetosCreados);
+                                                            crearTerceto(etiqueta,"_","_",tercetosCreados);
                                                         printf("\nREGLA 18: <seleccion> --> IF <condicion> THEN <programa> ELSE <programa> ENDIF\n");  
                                                         }
     | IF                               
-    condicion  THEN programa ENDIF    {
+    condicion  then programa ENDIF    {
                                
                                     
                                     int t; 
-                                     
-                                     while(!pilaVacia(&pilaComparacion)){
+                                    if( fueOr != 1){
+                                        
+                                         while(!pilaVacia(&pilaComparacion) )
+                                          {
                                          sacarDePila(&pilaComparacion,&t,sizeof(int));
-                                         escribirTercetoActualEnAnterior(tercetosCreados,t);
-                                     }
+                                         escribirTercetoActualEnAnterior(tercetosCreados,t,"etiqIF");
+                                          }
+
+                                    }else{
+                                        fueOr = 0;
+                                        sacarDePila(&pilaComparacion,&t,sizeof(int));
+                                         escribirTercetoActualEnAnterior(tercetosCreados,t,"etiqIF");
+                                           
+
+                                    }
+                                    
+                                 
                                      selecInd = desapilarNroTerceto();
+                                     char etiqueta[20];
+                                    sprintf(etiqueta,"etiqIF%d\0",tercetosCreados);
+                                     crearTerceto(etiqueta,"_","_",tercetosCreados);
                                     printf("\nREGLA 19: <seleccion> --> IF <condicion> THEN <programa> ENDIF \n");
                                     };
+
+
+
+then:
+    THEN                            {
+
+                                        if(fueOr == 1)
+                                        {   int nT;
+                                            char etiqueta[20];
+                                            sprintf(etiqueta,"etiqBQ%d\0",tercetosCreados);
+                                            crearTerceto(etiqueta,"_","_",tercetosCreados);
+                                            
+                                            sacarDePila(&pilaNroTerceto,&nT,sizeof(int));
+                                            contComparacion--;
+                                            while(  contComparacion > 0 ){
+                                            int t;
+                                            sacarDePila(&pilaNroTerceto,&t,sizeof(int));
+                                            escribirTercetoActualEnAnterior(tercetosCreados-1,t+1,"etiqBQ");
+                                            contComparacion--;
+                                            }
+                                            apilarNroTerceto(nT);
+                                           
+                                        }
+
+
+                                    };
+
+
 else:
     ELSE {   
         //  int t= desapilarNroTerceto();
         int t; 
          sacarDePila(&pilaComparacion,&t,sizeof(int));
-        escribirTercetoActualEnAnterior(tercetosCreados+1,t);
+        escribirTercetoActualEnAnterior(tercetosCreados+1,t,"etiqELSE");
         apilarNroTerceto(sentInd);
-        apilarNroTerceto(crearTerceto("BI","_","_",tercetosCreados));};
+        apilarNroTerceto(crearTerceto("BI","_","_",tercetosCreados));
+        
+        char etiqueta[20];
+        sprintf(etiqueta,"etiqELSE%d\0",tercetosCreados);
+        crearTerceto(etiqueta,"_","_",tercetosCreados);
+        };
 
 
            
@@ -209,32 +265,43 @@ ciclo:
                                    char nv[200];
                                     nv[0]='_';
                                     nv[1]='\0';
-                                    strcat(nv,yytext); 
+                                    strcat(nv,yytext);
+                                strcpy(idWhile , nv);
                             crearTerceto(nv,"_","_",tercetosCreados);
                         }
                  
 
-    IN COR_A lista      {   int t;
-                            cicloInd = crearTerceto("ETW","_","_",tercetosCreados);
+    IN COR_A lista      {   
+        
+                            char etiqueta[20];
+                            sprintf(etiqueta,"etiqWH%d\0",tercetosCreados);
+                            
+                            int t;
+                            cicloInd = crearTerceto(etiqueta,"_","_",tercetosCreados);
                             apilarNroTerceto(cicloInd);
-                            crearTerceto("CMP", "@pilaEstaVacia","@topePilaLista",tercetosCreados );
-                            apilarNroTerceto(crearTerceto("BNQ","_" ,"_",tercetosCreados));
-                             crearTerceto("OP_ASIG","@aux","@topePilaLista",tercetosCreados);
+                            crearTerceto("CMPWH", "@pilaEstaVacia","@topePilaLista",tercetosCreados );
+                            apilarNroTerceto(crearTerceto("BNE","_" ,"_",tercetosCreados));
+                             
                         }   
                            
     COR_C DO programa   {
  
                             int t = desapilarNroTerceto();
                             char auxT [LONG_TERCETO]; 
-                            escribirTercetoActualEnAnterior(tercetosCreados+1,t);
+                            escribirTercetoActualEnAnterior(tercetosCreados+1,t,"etiqWHF");
                             t = desapilarNroTerceto(); 
-                            sprintf(auxT,"[%d]",t);
-                            crearTerceto("BI","_",auxT,tercetosCreados);
+                            char etiqueta[20];
+                            sprintf(etiqueta,"etiqWH%d\0",t);
+                            crearTerceto("BI","_",etiqueta,tercetosCreados);
 
                         }
                       
 
-    ENDWHILE         {printf("\nREGLA 20: <ciclo> --> WHILE ID IN COR_A <lista> COR_C DO <sentencia> ENDWHILE\n");};
+    ENDWHILE         {  
+                         char etiqueta[20];
+                        sprintf(etiqueta,"etiqWHF%d\0",tercetosCreados);
+                        crearTerceto(etiqueta,"_","_",tercetosCreados);
+                        printf("\nREGLA 20: <ciclo> --> WHILE ID IN COR_A <lista> COR_C DO <sentencia> ENDWHILE\n");};
 
 entrada:
     GET ID                                          {   
@@ -283,6 +350,7 @@ asignacion:
 condicion:
     comparacion                                         {
                                                         condicionInd = comparacionInd;
+                                                        contComparacion++;
                                                         printf("\nREGLA 24: <condicion> --> <comparacion> \n");
                                                         }
                                                          
@@ -295,6 +363,7 @@ condicion:
                                                             
                                                         condicionInd = crearTerceto("AND", condicionAux , comparacionAux,tercetosCreados );
                                                         printf("\nREGLA 25: <condicion> --> <condicion> AND <comparacion>\n");
+                                                         contComparacion++;
                                                         }
     | condicion OR comparacion                          {
                                                             char condicionAux [LONG_TERCETO];
@@ -302,7 +371,9 @@ condicion:
                                                             sprintf(condicionAux,"[%d]",condicionInd);
                                                             sprintf(comparacionAux, "[%d]", comparacionInd);
                                                             condicionInd = crearTerceto("OR", condicionAux , comparacionAux,tercetosCreados );
+                                                          contComparacion++;
                                                             printf("\nREGLA 26: <condicion> --> <condicion> OR <comparacion>\n");
+                                                            fueOr = 1;
                                                         }
     
     | PAR_A NOT condicion PAR_C AND comparacion         {   char condicionAux [LONG_TERCETO];
@@ -342,7 +413,8 @@ comparacion:
                                                            apilarNroTerceto(comparacionInd);
                                                            int t= crearTerceto(comparador,"_","_" ,tercetosCreados);
                                                            ponerEnPila(&pilaComparacion,&t,sizeof(int));
-                                                          // apilarNroTerceto(t);
+                                                         
+                                    
                                                             printf("\nREGLA 29: <comparacion> --> <expresion><comparador><expresion> \n");
                                                         };
 
@@ -406,8 +478,8 @@ longitud:
     LONG PAR_A lista PAR_C                    {longInd = listaInd ; printf("\nREGLA 39: <longitud> --> <ID>OP_ASIF<LONG>PAR_A<lista>PAR_C\n");};
 
 lista:
-    factor                                              {listaInd = factInd ; contList=1;printf("\nREGLA 40: <lista> --> <factor> \n");}
-    | lista COMA factor                                 {listaInd = factInd; contList++;printf("\nREGLA 41: <lista> --> <lista>COMA<factor> \n");};
+    factor                                              {contWhile = 1; listaInd = factInd ; contList=1;printf("\nREGLA 40: <lista> --> <factor> \n");}
+    | lista COMA factor                                 {contWhile ++;listaInd = factInd; contList++;printf("\nREGLA 41: <lista> --> <lista>COMA<factor> \n");};
 
 factor:
     PAR_A expresion PAR_C       {
@@ -415,23 +487,13 @@ factor:
                                 ponerEnPila(&pilaFact,&factInd,sizeof(int));
                                 printf("\nREGLA 42: <factor> --> PAR_A <expresion> PAR_C\n");
                                 } 
-    | CONST_REAL                {          char nv[strlen(yytext)+3];
-                                    if( *yytext == '.' ){
-                              
-                                        nv[0] = '_';
-                                        nv[1] = '0';
-                                         nv[2] = '\0';
-                                        strcat(nv,yytext);
-                                      
-                                    }else{
-                                     
-                                        nv[0] = '_';
-                                        nv[1] = '\0';
-                                        strcat(nv,yytext);
-                                       
-                                    }
-                                 factInd = crearTerceto(nv,"_","_", tercetosCreados); 
-                                 cargarVecTablaNumeroReal(nv);
+    | CONST_REAL                {  
+
+                                char nv[20]  ="@real";
+                                sprintf( nv, "@real%d",contReal);
+                                contReal++;
+                                factInd = crearTerceto(nv,"_","_", tercetosCreados); 
+                                cargarVecTablaNumeroReal(nv,yytext);
                                 ponerEnPila(&pilaFact,&factInd,sizeof(int));
                              printf("\nREGLA 43: <factor> --> CONST_REAL\n");
                                 }
@@ -450,15 +512,12 @@ factor:
     | CONST_ENT                 {
                                 
                                 
-                                char nv[strlen(yytext)+4];
-                                nv[0]='_';
-                                nv[1] = '\0';
-                                strcat( nv,yytext);
-                                strcat(nv,".0\0");
-                                
+                                char nv[20] ;
+                                sprintf( nv, "@cte%d",conEnt);
+                                conEnt++;
                                 factInd = crearTerceto(nv,"_","_", tercetosCreados);
                                 ponerEnPila(&pilaFact,&factInd,sizeof(int));
-                                cargarVecTablaNumero(nv);
+                                cargarVecTablaNumero(nv,yytext);
                                 printf("\nREGLA 45: <factor> --> CONST_ENT\n");
                                 };
 
@@ -480,75 +539,38 @@ dec:
 
 
 
-void cargarVecTablaNumero(char * text)
+void cargarVecTablaNumero(char * text,char * valorReal)
 {
 
-   int duplicados = 0,j;
-    for ( j=0 ;j< (cantReg); j++)
-    {
-        if(strcmp(text,(tb[j].nombre)+1)==0)
-            duplicados = 1;      
-    }
-
-    if(!duplicados){
-        int tamanio=strlen(text),i;
-        char aux[tamanio+1];
-     
-        for (i=0; i<= tamanio ; i++ )
-        {
-            aux[i]=*(text+i+1);
-
-        }
-       
-        aux[i]='\0';
+   
         strcpy(tb[cantReg].nombre,text);
-         strcpy( tb[cantReg].valor,aux);
-    //    strcat(tb[cantReg].valor,".0");
+         strcpy( tb[cantReg].valor,valorReal );
+        strcat(tb[cantReg].valor,".0");
         strcpy(tb[cantReg].tipo,"INTEGER\0");
         tb[cantReg].longitud = 0;
-     
 
         (cantReg)++;
-    }
-
-
-
 }
 
-void cargarVecTablaNumeroReal(char * text)
+void cargarVecTablaNumeroReal(char * text,char * valorReal)
 {
 
-   int duplicados = 0,j;
-    for ( j=0 ;j< (cantReg); j++)
-    {
-        if(strcmp(text,(tb[j].nombre)+1)==0)
-            duplicados = 1;      
+
+    
+        
+    strcpy(tb[cantReg].nombre,text);
+
+    if(*valorReal == '.'){
+    
+        sprintf(tb[cantReg].valor, "0%s",valorReal);
+
+    }else{
+         strcpy(tb[cantReg].valor,valorReal);
     }
-
-    if(!duplicados){
-        
-        strcpy(tb[cantReg].nombre,text);
-        int tamanio=strlen(text),i;
-        char aux[tamanio+1];
-        
-        for (i=0; i< tamanio ; i++ )
-        {
-            aux[i]=*(text+i+1);
-
-        }
-        aux[i]='\0';
-  
-      
-     
-            strcpy(tb[cantReg].valor,aux);
-        
-        
+       
         strcpy(tb[cantReg].tipo,"FLOAT\0");
         tb[cantReg].longitud = 0;
-     
-
         (cantReg)++;
-    }
 
 
 
@@ -663,7 +685,8 @@ int desapilarNroTerceto()
 }
 
 
-void escribirTercetoActualEnAnterior(int tercetoAEscribir,int tercetoBuscado)
+
+void escribirTercetoActualEnAnterior(int tercetoAEscribir,int tercetoBuscado,char * etiqueta)
 {
     tCola  aux;
     crearCola(&aux);
@@ -677,8 +700,43 @@ void escribirTercetoActualEnAnterior(int tercetoAEscribir,int tercetoBuscado)
        
 
         if(terceto.numTerceto == tercetoBuscado){
+            int flag = 0;
+            if(fueOr == 1){
+              
+               
+                    if(strcmp ("BNE",terceto.posUno)==0 && flag != 1) {
+                        flag = 1;
+                       strcpy(terceto.posUno, "BEQ\0");                          
+
+                           
+                    
+                    }                        
+                    if(strcmp ("BLT",terceto.posUno)==0 && flag != 1) {
+                         flag = 1;
+                        strcpy(terceto.posUno, "BGE\0");        
+                    }
+                    if(strcmp ("BLE",terceto.posUno)==0  && flag != 1) {
+                      strcpy(terceto.posUno, "BGT\0");        
+                     flag = 1;
+                    }
+                    if(strcmp ("BGT",terceto.posUno)==0  && flag != 1) {
+                        strcpy(terceto.posUno, "BLE\0");        
+                    flag = 1;
+                    }       
+                    if(strcmp ("BGE",terceto.posUno)==0  && flag != 1) {
+                       strcpy(terceto.posUno, "BLT\0"); 
+                    flag = 1;                                  
+                    }
+                        
+                    if(strcmp ("BEQ",terceto.posUno)==0  && flag != 1) {
+                        strcpy(terceto.posUno, "BNE\0");
+                    flag = 1;                                
+                    }
+
+            }
+
                 char nueComponente [LONG_TERCETO];
-                sprintf( nueComponente, "[%d]",tercetoAEscribir);
+                sprintf( nueComponente, "%s%d",etiqueta,tercetoAEscribir);
                 strcpy(terceto.posTres, nueComponente);
         }
         ponerEnCola(&aux,&terceto,sizeof(terceto));
@@ -687,6 +745,9 @@ void escribirTercetoActualEnAnterior(int tercetoAEscribir,int tercetoBuscado)
     colaTercetos=aux;
 
 }
+
+
+
 
 
 int abrirTablaDeSimbolos(char * modo)
@@ -738,11 +799,16 @@ void escribirTablaSimbolos()
 
 void generarAssembler(){
 tPila pAss;
+tPila pWhile;
 crearPila(&pAss);
+crearPila(&pWhile);
+
 int  ponerEnPila(tPila *p, const void *d, unsigned cantBytes);
 
 fprintf(fpAss,  "include macros2.asm");
-fprintf(fpAss,  "\ninclude number.asm");
+// fprintf(fpAss,  "\ninclude numbers.asm");
+fprintf(fpAss,  "\ninclude macros.asm");
+
 fprintf(fpAss,  "\n.MODEL LARGE");
 fprintf(fpAss,  "\n.386");
 fprintf(fpAss,  "\n.STACK 200h");
@@ -754,23 +820,34 @@ while(fgets(linea, sizeof(linea),fpTabla)){
 
     char nombre[40];
     char tipo[20];
-    char valor[40];
+    char valor[100];
     char longitud[20];   
     sscanf(linea,"\n%s\t\t\t%s\t\t\t%[^\t]\t\t\t%s\n",nombre,tipo, valor,longitud);
-    if( strlen(valor)>1 && valor[0] =='-'){
-        valor[0] = '?';
-        valor[1] = '\0';
+
+    if(strcmp(tipo,"STRING") == 0){
+
+    fprintf(fpAss,"%-20s db\t\t %-30s, \'$\', %s dup (?)\n",nombre,valor,"14");
+
+    }else 
+    {
+        if( strlen(valor)>1 && valor[0] =='-'){
+            valor[0] = '?';
+            valor[1] = '\0';
+          }
+        fprintf(fpAss,"%-20s dd\t\t %-30s\n",nombre,valor);
+
     }
+    
 
 
-    fprintf(fpAss,"%-20s dd\t\t %-30s : numero en formato %s\n",nombre,valor,tipo);
+   // fprintf(fpAss,"%-20s dd\t\t %-30s\n",nombre,valor);
 
 }
 
 fprintf(fpAss,  "\n.CODE");
-fprintf(fpAss,  "\nmov AX.@DATA");
-fprintf(fpAss,  "\nmov DS.AX");
-fprintf(fpAss,  "\nmov es.ax;");
+fprintf(fpAss,  "\nMOV EAX,@DATA");
+fprintf(fpAss,  "\nMOV DS,EAX");
+fprintf(fpAss,  "\nMOV ES,EAX;\n\n");
 while(fgets(linea, sizeof(linea),fpIntermedia)){
      char p0[200];
      char p1[200];
@@ -780,30 +857,190 @@ while(fgets(linea, sizeof(linea),fpIntermedia)){
 
     sscanf(linea,"%s ( %s ; %s ; %s )",p0,p1,p2,p3);
     strcat(p0,"\0");
-    printf("\n%s      %s      %s      %s\n",p0,p1,p2,p3);
-    // if( (p2[0]  == '_')  &&  (p3[0] == '_') ){
-    //     ponerEnPila(&pAss, &p1 , sizeof(p1));
-    // }
+    // printf("\n%s      %s      %s      %s\n",p0,p1,p2,p3);
+      if( strncmp(p1,"etiq",4) != 0  && (p2[0]  == '_')  &&  (p3[0] == '_') ){
+         ponerEnPila(&pAss, &p1 , sizeof(p1));
 
-    // if(strcmp("OP_ASIG",p1) == 0 )
-    // {
-    //     char st0[200];
-    //     char st1[200];
-    //     sacarDePila(&fpAss,st0,sizeof(st0));       
-    //     sacarDePila(&fpAss,st1,sizeof(st1));
-    //     fprintf(fpAss,)
-    //     fprintf();
-    // }
+     }
 
-    // if(strcmp("OP_ASIG",p1) == 0 ){
+    if(strcmp("OP_ASIG",p1) == 0 )
+    {
+        char st[200];
+        sacarDePila(&pAss,st,sizeof(st)); 
+        fprintf(fpAss,"FSTP %s\n",st);     
+    }
 
-    // }
+    if(strcmp("OP_SUMA",p1) == 0 ){
+        char st[200];
+        sacarDePila(&pAss,st,sizeof(st));       
+        fprintf(fpAss,"FLD %s\n",st);
+        sacarDePila(&pAss,st,sizeof(st));       
+         fprintf(fpAss,"FLD %s\n",st);
+         fprintf(fpAss,"FXCH\n");
+        fprintf(fpAss,"FADD\n");
+    }
+
+    if(strcmp("OP_RESTA",p1) == 0 ){
+         char st[200];
+        sacarDePila(&pAss,st,sizeof(st));       
+        fprintf(fpAss,"FLD %s\n",st);
+        sacarDePila(&pAss,st,sizeof(st));       
+         fprintf(fpAss,"FLD %s\n",st);
+         fprintf(fpAss,"FXCH\n");
+        fprintf(fpAss,"FSUB\n");
+    }
+
+    if(strcmp("OP_DIV",p1) == 0 ){
+        char st[200];
+        sacarDePila(&pAss,st,sizeof(st));       
+        fprintf(fpAss,"FLD %s\n",st);
+        sacarDePila(&pAss,st,sizeof(st));       
+        fprintf(fpAss,"FLD %s\n",st);
+        fprintf(fpAss,"FXCH\n");
+        fprintf(fpAss,"FDIV\n");
+    }
+
+       if(strcmp("OP_MULT",p1) == 0 ){
+        char st[200];
+        sacarDePila(&pAss,st,sizeof(st));       
+        fprintf(fpAss,"FLD %s\n",st);
+        sacarDePila(&pAss,st,sizeof(st));       
+        fprintf(fpAss,"FLD %s\n",st);
+        fprintf(fpAss,"FXCH\n"); 
+        fprintf(fpAss,"FMUL\n");
+    }
+
+   if(strcmp("CMP",p1) == 0 ){
+         char st[200];
+        sacarDePila(&pAss,st,sizeof(st));
+        fprintf(fpAss,"FLD %s\n",st);
+        sacarDePila(&pAss,st,sizeof(st));       
+        fprintf(fpAss,"FLD %s\n",st); 
+        fprintf(fpAss,"FXCH\n"); 
+        fprintf(fpAss,"FCOM\n");
+        fprintf(fpAss,"FSTSW AX\n");
+        fprintf(fpAss,"SAHF\n");
+        fprintf(fpAss,"FFREE\n");
+    }
+
+    if(strcmp("CMPWH",p1) == 0 ){
+        int i=0;
+        char st[200];
+        tPila auxP;
+        crearPila(&auxP);
+        for (i=0 ; i < contWhile ; i++){
+            sacarDePila(&pAss,st,sizeof(st)); 
+            fprintf(fpAss,"FLD %s\n",st) ;   
+        }
+        char etWhile[200];
+        sacarDePila(&pWhile,etWhile,sizeof(etWhile));
+        fprintf(fpAss,"%s\n",etWhile);
+        fprintf(fpAss,"FLD %s\n",idWhile);
+        fprintf(fpAss,"FCOMPP\n");  
+        fprintf(fpAss,"FSTSW AX\n");
+        fprintf(fpAss,"SAHF\n");
+        
+   
+
+        }
+    
+
+
+    
+    if(strcmp ("BNE",p1)==0) {
+        char et[10];
+        sscanf(p3,"%[^ ]",et);
+        fprintf(fpAss,"JNE %s\n",et);
+
+    }
+
+        
+    if(strcmp ("BLT",p1)==0) {
+         char et[10];
+        sscanf(p3,"%[^ ]",et);
+        fprintf(fpAss,"JB %s\n",et);
+    }
+
+        
+    if(strcmp ("BLE",p1)==0) {
+        char et[10];
+        sscanf(p3,"%[^ ]",et);
+        fprintf(fpAss,"JNA %s\n",et);
+      
+    }
+
+        
+    if(strcmp ("BGT",p1)==0) {
+           char et[10];
+        sscanf(p3,"%[^ ]",et);
+          fprintf(fpAss,"JA %s\n",et);
+       
+    }
+
+        
+    if(strcmp ("BGE",p1)==0) {
+        char et[10];
+        sscanf(p3,"%[^ ]",et);
+        fprintf(fpAss,"JAE %s\n",et);
+      
+    }
+        
+    if(strcmp ("BEQ",p1)==0) {
+        char et[10];
+        sscanf(p3,"%[^ ]",et);
+        fprintf(fpAss,"JE %s\n",et);
+   
+    }
+
+    if(strcmp("BI", p1) == 0){
+        char et[10];
+     
+        sscanf(p3,"%[^ ]",et);
+      
+        fprintf(fpAss,"JMP %s\n",et);
+
+    }
+
+    if(strncmp(p1,"etiqIF",6) == 0 ){
+        fprintf(fpAss,"%s\n",p1);
+    }
+
+    if(strncmp(p1,"etiqELSE",8) == 0 ){
+        fprintf(fpAss,"%s\n",p1);
+    }
+
+
+
+    if(strncmp(p1,"etiqWH",6) == 0 ){
+
+        ponerEnPila(&pWhile,p1,sizeof(p1));
+    }
+
+    if(strncmp(p1,"etiqWHF",7) == 0 ){
+        fprintf(fpAss,"%s\n",p1);
+        fprintf(fpAss,"FFREE\n");
+    }
+    
+    if(strncmp(p1,"etiqBQ",6) == 0 ){
+        fprintf(fpAss,"%s\n",p1);
+
+    }
+
+    if(strcmp(p1,"DISPLAY") == 0){
+       fprintf(fpAss,"displayString %s\n", p2 );      
+    }
+
+    
+    if(strcmp(p1,"GET") == 0){
+       fprintf(fpAss,"displayString %s\n", p2 );      
+    }
 
 
 }
 
 
-fprintf(fpAss,  "\nmov ax.4c00h");
+
+fprintf(fpAss,  "\nmov ax,4c00h");
 fprintf(fpAss,  "\nint 21h");
 fprintf(fpAss,  "\nEnd");
 
